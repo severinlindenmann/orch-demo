@@ -13,6 +13,7 @@ class RawMeterRead(BaseModel):
     gateway_id: str
     read_at: datetime
     kwh: float = Field(ge=0)
+    meter_type: str | None = None
     quality_flag: str | None = None
 
 
