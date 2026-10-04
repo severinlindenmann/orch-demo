@@ -2,9 +2,12 @@
 from __future__ import annotations
 
 import csv
+import logging
 from pathlib import Path
 
 from acme.models import RawMeterRead
+
+logger = logging.getLogger(__name__)
 
 
 def parse_gateway_export(path: Path) -> list[RawMeterRead]:
@@ -12,19 +15,28 @@ def parse_gateway_export(path: Path) -> list[RawMeterRead]:
 
     Gateway exports are plain CSV with columns:
     `meter_id, gateway_id, read_at, kwh`.
+
+    A row that fails to parse (bad numeric value, missing column, ...) is
+    skipped and logged rather than aborting the whole file - one bad row
+    from a flaky gateway should not cost us the rest of the day's reads.
     """
     reads: list[RawMeterRead] = []
     with path.open(newline="") as fh:
         reader = csv.DictReader(fh)
-        for row in reader:
-            reads.append(
-                RawMeterRead(
-                    meter_id=row["meter_id"],
-                    gateway_id=row["gateway_id"],
-                    read_at=row["read_at"],
-                    kwh=float(row["kwh"]),
+        for line_no, row in enumerate(reader, start=2):  # header is line 1
+            try:
+                reads.append(
+                    RawMeterRead(
+                        meter_id=row["meter_id"],
+                        gateway_id=row["gateway_id"],
+                        read_at=row["read_at"],
+                        kwh=float(row["kwh"]),
+                    )
                 )
-            )
+            except (KeyError, ValueError, TypeError) as exc:
+                logger.warning(
+                    "skipping malformed row %s:%d (%s): %s", path.name, line_no, row, exc
+                )
     return reads
 
 
