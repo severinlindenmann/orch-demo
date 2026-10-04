@@ -8,7 +8,7 @@ version = "0.1.0"
 description = "Ingestion, transformation and quality checks for Acme Energy's meter data platform."
 readme = "README.md"
 requires-python = ">=3.11"
-license = { text = "Proprietary" }
+license = { text = "MIT" }
 dependencies = [
     "pandas>=2.1,!=2.2.0",
     "pydantic>=2.6",
