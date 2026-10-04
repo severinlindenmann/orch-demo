@@ -23,6 +23,17 @@ class QualityReport:
         return self.null_meter_ids == 0 and self.suspect_rate <= max_suspect_rate
 
 
+def suspect_rate_percent(report: QualityReport) -> float:
+    """Suspect rate as a percentage, for the on-call summary line.
+
+    Guards the zero-rows case explicitly rather than relying on the
+    caller to check `total_rows` first.
+    """
+    if report.total_rows == 0:
+        return 0.0
+    return 100 * report.suspect_rows / report.total_rows
+
+
 def build_quality_report(reads: list[MeterRead]) -> QualityReport:
     seen: set[tuple[str, object]] = set()
     duplicates = 0
