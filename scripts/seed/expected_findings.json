@@ -1,0 +1,26 @@
+{
+  "claim-expired": {
+    "tickets": "*",
+    "why": "Claims age by design: DEMO-0003, DEMO-0014 and DEMO-0025 are the stale-claim examples, and waiting or testing tickets keep their claim while they wait. Run `seed.py refresh-claims --apply` before a live demo."
+  },
+  "gate-invalidated": {
+    "tickets": [
+      "DEMO-0018",
+      "DEMO-0025",
+      "DEMO-0033"
+    ],
+    "why": "The 'changed' gate examples: DEMO-0018 requirements and DEMO-0025 plan were edited after approval; DEMO-0033's requirements were edited after the epic approval of DEMO-0031 (changed since epic approval)."
+  },
+  "task-doing-stale": {
+    "tickets": [
+      "DEMO-0025"
+    ],
+    "why": "DEMO-0025 is the stale-claim example: its T1 stays in progress after the claim expired, so Mission Control shows a stale doing task."
+  },
+  "delegated-approval": {
+    "tickets": [
+      "DEMO-0036"
+    ],
+    "why": "DEMO-0036 is the child an agent added to DEMO-0031 and auto-approved under the epic's signed delegation; orch check lists every such approval as an info line."
+  }
+}

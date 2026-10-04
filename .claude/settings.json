@@ -1,0 +1,17 @@
+{
+  "attribution": {
+    "commit": "",
+    "pr": ""
+  },
+  "extraKnownMarketplaces": {
+    "orch-core": {
+      "source": {
+        "source": "github",
+        "repo": "severinlindenmann/orch-core"
+      }
+    }
+  },
+  "enabledPlugins": {
+    "orch-core@orch-core": true
+  }
+}

@@ -1,0 +1,90 @@
+{
+  "schema": 1,
+  "customer": "Acme Energy",
+  "harnesses": [
+    "claude-plugin"
+  ],
+  "id": {
+    "prefix": "DEMO",
+    "pad": 4
+  },
+  "external_trackers": [
+    {
+      "prefix": "GH",
+      "pattern": "GH-(?P<id>\\d+)",
+      "url": "https://github.com/severinlindenmann/orch-demo/issues/{id}"
+    }
+  ],
+  "git": {
+    "type": "github",
+    "base_url": "https://github.com/severinlindenmann/orch-demo",
+    "review_term": "PR",
+    "repos": {
+      "acme-energy-data": {
+        "path": ".",
+        "default_branch": "main"
+      },
+      "ingest": {
+        "path": "ingest",
+        "default_branch": "main"
+      },
+      "dbt": {
+        "path": "dbt",
+        "default_branch": "main"
+      },
+      "infra": {
+        "path": "infra",
+        "default_branch": "main"
+      }
+    },
+    "branch_pattern": "feature/{key}-{slug}",
+    "agent_may": {
+      "commit": false,
+      "push": false,
+      "open_review": false
+    }
+  },
+  "wiki": {
+    "type": "markdown",
+    "base_url": "",
+    "space": ""
+  },
+  "commit": {
+    "subject": "{key} {summary}",
+    "body": [
+      "What",
+      "Why",
+      "Risk"
+    ],
+    "rollback": false,
+    "forbid_attribution": true
+  },
+  "gates": {
+    "plan_skip_sizes": [
+      "xs"
+    ]
+  },
+  "claims": {
+    "ttl_hours": 4
+  },
+  "artifacts": {
+    "mode": "local"
+  },
+  "temporary": {
+    "max_age_days": 14
+  },
+  "dashboard": {
+    "host": "127.0.0.1",
+    "port": 8765,
+    "pull_seconds": 60,
+    "theme": "system",
+    "brand": "none",
+    "stale_minutes": 120
+  },
+  "suggested_addons": [
+    "github-reviews",
+    "github-issues",
+    "databricks",
+    "wiki"
+  ]
+}

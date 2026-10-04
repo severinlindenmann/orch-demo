@@ -1,0 +1,25 @@
+# >>> orch: managed by `orch instructions sync` and `orch doctor --fix`; add your own lines outside this block
+# Local only: caches, locks, spools and per-machine state. Tickets, gates, counter.json,
+# events.jsonl, remote/ledger.jsonl and addon records/ are shared records: commit them.
+/temporary/
+/.state/locks/
+/.state/index.json
+/.state/addon-errors.log
+/.state/guard-errors.log
+/.state/needs-count
+/.state/run/
+/.state/**/*.lock
+**/.*.tmp
+/.state/addons/*
+!/.state/addons/*/
+/.state/addons/*/*
+!/.state/addons/*/records/
+# <<< orch
+
+temporary/
+.state/locks/
+.state/index.json
+.state/addon-errors.log
+.state/guard-errors.log
+.state/addons/
+.state/needs-count

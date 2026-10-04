@@ -1,0 +1,459 @@
+{
+ "labels": [
+  {
+   "name": "type:feature",
+   "color": "1f77b4",
+   "description": ""
+  },
+  {
+   "name": "type:bug",
+   "color": "d73a4a",
+   "description": ""
+  },
+  {
+   "name": "type:chore",
+   "color": "c5def5",
+   "description": ""
+  },
+  {
+   "name": "type:spike",
+   "color": "8e44ad",
+   "description": ""
+  },
+  {
+   "name": "priority:high",
+   "color": "e99695",
+   "description": ""
+  },
+  {
+   "name": "priority:urgent",
+   "color": "b60205",
+   "description": ""
+  },
+  {
+   "name": "area:ingest",
+   "color": "0e8a16",
+   "description": ""
+  },
+  {
+   "name": "area:infra",
+   "color": "5319e7",
+   "description": ""
+  },
+  {
+   "name": "area:quality",
+   "color": "fbca04",
+   "description": ""
+  },
+  {
+   "name": "review:approved",
+   "color": "0e8a16",
+   "description": ""
+  },
+  {
+   "name": "review:changes-requested",
+   "color": "d93f0b",
+   "description": ""
+  }
+ ],
+ "milestones": [
+  {
+   "title": "Sprint 41",
+   "state": "closed"
+  },
+  {
+   "title": "Sprint 42",
+   "state": "open"
+  },
+  {
+   "title": "Sprint 43",
+   "state": "open"
+  }
+ ],
+ "issues": [
+  {
+   "number": 1,
+   "title": "Add retry logic for flaky gateway export downloads",
+   "body": "## Context\nThe nightly pull from substation gateways times out intermittently\n(roughly 1 in 40 runs). Today a timeout just fails the whole job with\nno retry.\n\n## Acceptance criteria\n- [ ] Download step retries up to 3 times with backoff on timeout\n- [ ] A permanent failure after retries is logged with the gateway id\n- [ ] Covered by a unit test using a fake flaky transport",
+   "labels": [
+    "type:feature",
+    "area:ingest"
+   ],
+   "milestone": "Sprint 42",
+   "mine": false,
+   "closed": false,
+   "comment": null
+  },
+  {
+   "number": 2,
+   "title": "Spike: dbt vs plain SQL for the marts layer",
+   "body": "## Context\n`sql/` currently holds plain SQL files with Jinja-style `{{ ref(...) }}`\nplaceholders but no actual dbt project. We should decide whether to\nadopt dbt properly before adding more marts.\n\n## Acceptance criteria\n- [ ] Short write-up comparing dbt-core vs. keeping hand-rolled SQL + a thin runner\n- [ ] Recommendation with rough migration cost for the 4 existing models\n- [ ] Posted as a comment on this issue, no code change required",
+   "labels": [
+    "type:spike"
+   ],
+   "milestone": "Sprint 42",
+   "mine": false,
+   "closed": false,
+   "comment": "Spike notes (DEMO-0008):\n\n- dbt would buy us `ref()`/`source()` resolution, docs generation and `dbt test` for free, instead of our hand-rolled runner.\n- Migration cost for the 4 existing models is small, but we'd also need a `profiles.yml` per environment and CI changes.\n- Decision: not now. Revisit once we have more than ~10 models; today the overhead isn't worth it for 4 files."
+  },
+  {
+   "number": 3,
+   "title": "Suspect-read threshold should vary by meter type",
+   "body": "## Context\n`max_interval_kwh` is a single global constant, but industrial meters\nlegitimately exceed 50 kWh per 15-minute interval. This causes a lot of\nfalse-positive suspect flags for that meter class.\n\n## Acceptance criteria\n- [ ] Threshold configurable per `meter_type` (residential, commercial, industrial)\n- [ ] Falls back to the current global default when meter type is unknown\n- [ ] Tests cover at least two meter types",
+   "labels": [
+    "type:feature",
+    "priority:high",
+    "area:quality"
+   ],
+   "milestone": "Sprint 42",
+   "mine": true,
+   "closed": false,
+   "comment": null
+  },
+  {
+   "number": 4,
+   "title": "CI pipeline is missing coverage reporting",
+   "body": "## Context\n`pytest -q` runs in CI but we don't publish coverage, so we can't tell\nwhich modules are under-tested as the pipeline grows.\n\n## Acceptance criteria\n- [ ] CI runs `pytest --cov=acme`\n- [ ] Coverage summary printed in the job log\n- [ ] No hard coverage gate yet, just visibility",
+   "labels": [
+    "type:chore",
+    "area:infra"
+   ],
+   "milestone": "Sprint 42",
+   "mine": false,
+   "closed": false,
+   "comment": null
+  },
+  {
+   "number": 5,
+   "title": "Quality report divides by zero when a run has no reads",
+   "body": "## Context\nIf a gateway export directory is empty for a day (holiday, gateway\noutage), `QualityReport.suspect_rate` should be 0, but a related\nreporting script computes the rate independently and raises\n`ZeroDivisionError`, which pages on-call unnecessarily.\n\n## Acceptance criteria\n- [ ] No code path can divide by a zero total-rows count\n- [ ] An empty run produces a passing, zero-valued report instead of an exception\n- [ ] Regression test added for the empty-input case",
+   "labels": [
+    "type:bug",
+    "priority:urgent",
+    "area:quality"
+   ],
+   "milestone": "Sprint 42",
+   "mine": true,
+   "closed": false,
+   "comment": null
+  },
+  {
+   "number": 6,
+   "title": "Partition mart_daily_consumption by month",
+   "body": "## Context\n`mart_daily_consumption` is currently a full rebuild every run. As\nhistory grows past a few months this is already noticeably slower in\nthe staging warehouse.\n\n## Acceptance criteria\n- [ ] Table partitioned by month on `read_date`\n- [ ] Incremental rebuild only touches the current and previous partition\n- [ ] Documented in `sql/marts/`",
+   "labels": [
+    "type:feature",
+    "area:infra"
+   ],
+   "milestone": "Sprint 43",
+   "mine": false,
+   "closed": false,
+   "comment": null
+  },
+  {
+   "number": 7,
+   "title": "Ingest fails silently on malformed CSV rows",
+   "body": "## Context\n`parse_gateway_export` uses `csv.DictReader` directly; a row with a\nnon-numeric `kwh` value (seen once from GW-07 after a firmware bug)\nraises inside the loop and the whole file is skipped with only a\ngeneric traceback in the logs.\n\n## Acceptance criteria\n- [ ] A malformed row is skipped and logged with file name + row number\n- [ ] The rest of the file is still ingested\n- [ ] Test covers a file with one bad row among several good ones",
+   "labels": [
+    "type:bug",
+    "priority:high",
+    "area:ingest"
+   ],
+   "milestone": "Sprint 42",
+   "mine": true,
+   "closed": true,
+   "comment": "Fixed in a follow-up patch: malformed rows are now skipped and logged instead of aborting the file."
+  },
+  {
+   "number": 8,
+   "title": "Add tests for the meter master staging model",
+   "body": "## Context\n`sql/staging/stg_meters.sql` has no automated check that\n`meter_id` is unique or that `install_date` is never in the future.\n\n## Acceptance criteria\n- [ ] Uniqueness check on meter_id\n- [ ] Not-null checks on meter_id and substation_id\n- [ ] install_date not-in-future check",
+   "labels": [
+    "type:chore",
+    "area:quality"
+   ],
+   "milestone": "Sprint 42",
+   "mine": false,
+   "closed": false,
+   "comment": null
+  },
+  {
+   "number": 9,
+   "title": "Handle late-arriving gateway exports",
+   "body": "## Context\n`PipelineConfig.allowed_late_days` exists but nothing in `ingest.py`\ncurrently checks an export's date against it; late files are ingested\nwithout any flag, which has caused one silently-stale mart in the past.\n\n## Acceptance criteria\n- [ ] Exports older than `allowed_late_days` are rejected with a clear error\n- [ ] Exports within the allowed window are ingested and logged as late\n- [ ] Tests cover on-time, late-but-allowed and rejected cases",
+   "labels": [
+    "type:feature",
+    "area:ingest"
+   ],
+   "milestone": "Sprint 43",
+   "mine": false,
+   "closed": false,
+   "comment": null
+  },
+  {
+   "number": 10,
+   "title": "Spike: evaluate Parquet for gateway exports",
+   "body": "## Context\nCSV exports are ~4x larger on disk than they need to be and parsing\nis a measurable chunk of the nightly run. A couple of newer gateway\nfirmwares already support Parquet output.\n\n## Acceptance criteria\n- [ ] Benchmark parse time and size for CSV vs Parquet on one day of real exports\n- [ ] Note any gateway firmware versions that do not support Parquet yet\n- [ ] Recommendation posted as a comment, no code change required",
+   "labels": [
+    "type:spike"
+   ],
+   "milestone": "Sprint 43",
+   "mine": false,
+   "closed": false,
+   "comment": null
+  },
+  {
+   "number": 11,
+   "title": "Transform drops timezone-naive reads instead of assuming UTC",
+   "body": "## Context\nA firmware update on GW-09 started emitting `read_at` without a\ntimezone suffix. `normalize_reads` currently raises a validation error\non these rows instead of assuming UTC, which dropped a full day of\nreads for that gateway.\n\n## Acceptance criteria\n- [ ] Timezone-naive timestamps are treated as UTC\n- [ ] A warning is logged when this happens, so we can chase the firmware fix\n- [ ] Regression test for a naive timestamp input",
+   "labels": [
+    "type:bug",
+    "priority:high",
+    "area:ingest"
+   ],
+   "milestone": "Sprint 42",
+   "mine": true,
+   "closed": false,
+   "comment": null
+  },
+  {
+   "number": 12,
+   "title": "Alert when suspect rate exceeds threshold for 3 consecutive runs",
+   "body": "## Context\nA single bad run is expected occasionally, but 3 consecutive suspect\nspikes from the same gateway usually means a real fault, not noise.\nRight now nobody is notified until someone happens to look at the\ndashboard.\n\n## Acceptance criteria\n- [ ] Track suspect rate history per gateway across runs\n- [ ] Emit an alert (log line is enough for now) after 3 consecutive breaches\n- [ ] Unit test for the 3-strikes logic",
+   "labels": [
+    "type:feature",
+    "area:quality"
+   ],
+   "milestone": "Sprint 43",
+   "mine": false,
+   "closed": false,
+   "comment": null
+  },
+  {
+   "number": 13,
+   "title": "Gateway exports sometimes use inconsistent timestamp formats",
+   "body": "## Context\nTwo substations (GW-04, GW-11) have started sending `read_at` as\n`DD/MM/YYYY HH:MM` instead of ISO 8601. `parse_gateway_export` currently\nassumes ISO 8601 and raises on these files, which blocks the whole daily\ningest run.\n\n## Acceptance criteria\n- [ ] `parse_gateway_export` accepts both the ISO 8601 and `DD/MM/YYYY HH:MM` formats\n- [ ] A malformed timestamp in one row does not abort the whole file\n- [ ] Unit tests cover both formats and a malformed row",
+   "labels": [
+    "type:bug",
+    "priority:high",
+    "area:ingest"
+   ],
+   "milestone": "Sprint 41",
+   "mine": true,
+   "closed": true,
+   "comment": "Fixed; both timestamp formats are now accepted and malformed rows no longer abort the file."
+  },
+  {
+   "number": 14,
+   "title": "Quality gate should flag duplicate interval reads",
+   "body": "## Context\n`build_quality_report` counts duplicates but the ingest job does not\nact on that count yet, so duplicate rows (seen after a gateway\nre-sends a file) silently double-count consumption.\n\n## Acceptance criteria\n- [ ] Duplicate rows above 0 fail the quality gate by default\n- [ ] The failure message includes the duplicate count and an example key\n- [ ] Existing passing-run tests still pass",
+   "labels": [
+    "type:feature",
+    "area:quality"
+   ],
+   "milestone": "Sprint 41",
+   "mine": true,
+   "closed": true,
+   "comment": "Duplicate reads now fail the quality gate by default."
+  },
+  {
+   "number": 15,
+   "title": "Pin dependency versions in pyproject.toml",
+   "body": "## Context\n`pandas>=2.1` and `pydantic>=2.5` are unpinned minimums. A transitive\nupgrade broke local dev for a teammate this week.\n\n## Acceptance criteria\n- [ ] Add upper bounds (or a lockfile) for direct dependencies\n- [ ] CI still passes\n- [ ] Documented in README how to refresh pins",
+   "labels": [
+    "type:chore",
+    "area:infra"
+   ],
+   "milestone": "Sprint 41",
+   "mine": false,
+   "closed": true,
+   "comment": "Dependencies pinned with upper bounds; documented the refresh process in the README."
+  }
+ ],
+ "prs": [
+  {
+   "number": 16,
+   "branch": "fix/DEMO-0006-ingest-malformed-rows",
+   "title": "DEMO-0006 Skip malformed CSV rows instead of aborting the file",
+   "body": "Closes #7\n\nLocal ticket: DEMO-0006\n\n## What\n`parse_gateway_export` now catches per-row parse errors, logs a warning\nwith the file name and line number, and keeps parsing the rest of the\nfile instead of raising.\n\n## Why\nA single malformed row (seen from GW-07 after a firmware bug) was\nsilently dropping an entire day's reads for that gateway.\n\n## Risk\nLow. Only affects rows that previously raised; valid rows are\nunaffected. Covered by a regression test.",
+   "draft": false,
+   "labels": [],
+   "commit": {
+    "subject": "DEMO-0006 Skip malformed CSV rows instead of aborting the file",
+    "body": "What: parse_gateway_export now catches per-row parse errors, logs a\nwarning with file name and line number, and keeps parsing the rest\nof the file.\nWhy: A single bad row (seen from GW-07 after a firmware bug) was\nsilently dropping an entire day's reads for that gateway.\nRisk: Low. Only affects rows that previously raised; valid rows are\nunaffected."
+   },
+   "files": {
+    "src/acme/ingest.py": "\"\"\"Ingest raw interval-read exports from substation gateways.\"\"\"\nfrom __future__ import annotations\n\nimport csv\nimport logging\nfrom pathlib import Path\n\nfrom acme.models import RawMeterRead\n\nlogger = logging.getLogger(__name__)\n\n\ndef parse_gateway_export(path: Path) -> list[RawMeterRead]:\n    \"\"\"Parse one gateway export CSV into a list of `RawMeterRead`.\n\n    Gateway exports are plain CSV with columns:\n    `meter_id, gateway_id, read_at, kwh`.\n\n    A row that fails to parse (bad numeric value, missing column, ...) is\n    skipped and logged rather than aborting the whole file - one bad row\n    from a flaky gateway should not cost us the rest of the day's reads.\n    \"\"\"\n    reads: list[RawMeterRead] = []\n    with path.open(newline=\"\") as fh:\n        reader = csv.DictReader(fh)\n        for line_no, row in enumerate(reader, start=2):  # header is line 1\n            try:\n                reads.append(\n                    RawMeterRead(\n                        meter_id=row[\"meter_id\"],\n                        gateway_id=row[\"gateway_id\"],\n                        read_at=row[\"read_at\"],\n                        kwh=float(row[\"kwh\"]),\n                    )\n                )\n            except (KeyError, ValueError, TypeError) as exc:\n                logger.warning(\n                    \"skipping malformed row %s:%d (%s): %s\", path.name, line_no, row, exc\n                )\n    return reads\n\n\ndef load_gateway_exports(export_dir: Path) -> list[RawMeterRead]:\n    \"\"\"Parse every `.csv` export found directly under `export_dir`.\"\"\"\n    reads: list[RawMeterRead] = []\n    for csv_path in sorted(export_dir.glob(\"*.csv\")):\n        reads.extend(parse_gateway_export(csv_path))\n    return reads\n",
+    "tests/test_ingest_malformed.py": "from __future__ import annotations\n\nfrom pathlib import Path\n\nfrom acme.ingest import parse_gateway_export\n\n\ndef test_parse_gateway_export_skips_malformed_rows(tmp_path: Path):\n    export = tmp_path / \"gw07.csv\"\n    export.write_text(\n        \"meter_id,gateway_id,read_at,kwh\\n\"\n        \"MTR-001,GW-07,2026-09-01T00:00:00Z,1.2\\n\"\n        \"MTR-002,GW-07,2026-09-01T00:00:00Z,not-a-number\\n\"\n        \"MTR-003,GW-07,2026-09-01T00:15:00Z,1.5\\n\"\n    )\n    reads = parse_gateway_export(export)\n    assert len(reads) == 2\n    assert [r.meter_id for r in reads] == [\"MTR-001\", \"MTR-003\"]\n"
+   },
+   "comment": null,
+   "merge": true,
+   "close": false
+  },
+  {
+   "number": 17,
+   "branch": "fix/DEMO-0007-gateway-timestamp-formats",
+   "title": "DEMO-0007 Accept DD/MM/YYYY gateway timestamps",
+   "body": "Closes #13\n\nLocal ticket: DEMO-0007\n\n## What\n`parse_gateway_export` now normalizes the `DD/MM/YYYY HH:MM` timestamp\nformat (seen from GW-04 and GW-11) to ISO 8601 before validation,\nalongside the existing ISO 8601 inputs.\n\n## Why\nThese two substations started emitting the alternate format and the\nwhole daily ingest run was failing on their files.\n\n## Risk\nLow. Falls through to the existing ISO parsing for every other\ngateway; covered by a new regression test.",
+   "draft": false,
+   "labels": [],
+   "commit": {
+    "subject": "DEMO-0007 Accept DD/MM/YYYY gateway timestamps",
+    "body": "What: parse_gateway_export now normalizes the DD/MM/YYYY HH:MM\ntimestamp format (seen from GW-04 and GW-11) to ISO 8601 before\nvalidation, alongside the existing ISO 8601 inputs.\nWhy: These two substations started emitting the alternate format and\nthe whole daily ingest run was failing on their files.\nRisk: Low. Falls through to the existing ISO parsing for every other\ngateway; covered by a new regression test."
+   },
+   "files": {
+    "src/acme/ingest.py": "\"\"\"Ingest raw interval-read exports from substation gateways.\"\"\"\nfrom __future__ import annotations\n\nimport csv\nimport logging\nfrom datetime import datetime\nfrom pathlib import Path\n\nfrom acme.models import RawMeterRead\n\nlogger = logging.getLogger(__name__)\n\n_ALT_TIMESTAMP_FORMAT = \"%d/%m/%Y %H:%M\"\n\n\ndef _parse_timestamp(value: str) -> str:\n    \"\"\"Normalize a gateway timestamp to ISO 8601.\n\n    Most gateways emit ISO 8601 already, which pydantic parses directly.\n    A couple of substations (GW-04, GW-11) emit `DD/MM/YYYY HH:MM`\n    instead; this coerces that alternate format to ISO 8601 so it\n    validates the same way.\n    \"\"\"\n    try:\n        datetime.fromisoformat(value.replace(\"Z\", \"+00:00\"))\n        return value\n    except ValueError:\n        parsed = datetime.strptime(value, _ALT_TIMESTAMP_FORMAT)\n        return parsed.isoformat()\n\n\ndef parse_gateway_export(path: Path) -> list[RawMeterRead]:\n    \"\"\"Parse one gateway export CSV into a list of `RawMeterRead`.\n\n    Gateway exports are plain CSV with columns:\n    `meter_id, gateway_id, read_at, kwh`.\n\n    A row that fails to parse (bad numeric value, missing column, ...) is\n    skipped and logged rather than aborting the whole file - one bad row\n    from a flaky gateway should not cost us the rest of the day's reads.\n    \"\"\"\n    reads: list[RawMeterRead] = []\n    with path.open(newline=\"\") as fh:\n        reader = csv.DictReader(fh)\n        for line_no, row in enumerate(reader, start=2):  # header is line 1\n            try:\n                reads.append(\n                    RawMeterRead(\n                        meter_id=row[\"meter_id\"],\n                        gateway_id=row[\"gateway_id\"],\n                        read_at=_parse_timestamp(row[\"read_at\"]),\n                        kwh=float(row[\"kwh\"]),\n                    )\n                )\n            except (KeyError, ValueError, TypeError) as exc:\n                logger.warning(\n                    \"skipping malformed row %s:%d (%s): %s\", path.name, line_no, row, exc\n                )\n    return reads\n\n\ndef load_gateway_exports(export_dir: Path) -> list[RawMeterRead]:\n    \"\"\"Parse every `.csv` export found directly under `export_dir`.\"\"\"\n    reads: list[RawMeterRead] = []\n    for csv_path in sorted(export_dir.glob(\"*.csv\")):\n        reads.extend(parse_gateway_export(csv_path))\n    return reads\n",
+    "tests/test_ingest.py": "from __future__ import annotations\n\nfrom pathlib import Path\n\nfrom acme.ingest import load_gateway_exports, parse_gateway_export\n\n\ndef test_parse_gateway_export(tmp_path: Path):\n    export = tmp_path / \"gw01.csv\"\n    export.write_text(\n        \"meter_id,gateway_id,read_at,kwh\\n\"\n        \"MTR-001,GW-01,2026-09-01T00:00:00Z,1.2\\n\"\n        \"MTR-001,GW-01,2026-09-01T00:15:00Z,1.4\\n\"\n    )\n    reads = parse_gateway_export(export)\n    assert len(reads) == 2\n    assert reads[0].meter_id == \"MTR-001\"\n\n\ndef test_load_gateway_exports_reads_all_csvs(tmp_path: Path):\n    (tmp_path / \"gw01.csv\").write_text(\n        \"meter_id,gateway_id,read_at,kwh\\nMTR-001,GW-01,2026-09-01T00:00:00Z,1.0\\n\"\n    )\n    (tmp_path / \"gw02.csv\").write_text(\n        \"meter_id,gateway_id,read_at,kwh\\nMTR-002,GW-02,2026-09-01T00:00:00Z,2.0\\n\"\n    )\n    reads = load_gateway_exports(tmp_path)\n    assert len(reads) == 2\n\n\ndef test_parse_gateway_export_accepts_alt_timestamp_format(tmp_path: Path):\n    export = tmp_path / \"gw04.csv\"\n    export.write_text(\n        \"meter_id,gateway_id,read_at,kwh\\n\"\n        \"MTR-010,GW-04,01/09/2026 00:00,1.1\\n\"\n    )\n    reads = parse_gateway_export(export)\n    assert len(reads) == 1\n    assert reads[0].read_at.year == 2026\n    assert reads[0].read_at.month == 9\n    assert reads[0].read_at.day == 1\n"
+   },
+   "comment": null,
+   "merge": true,
+   "close": false
+  },
+  {
+   "number": 18,
+   "branch": "chore/DEMO-0005-pin-dependency-versions",
+   "title": "DEMO-0005 Pin dependency upper bounds",
+   "body": "Closes #15\n\nLocal ticket: DEMO-0005\n\n## What\nAdd upper bounds to the pandas and pydantic dependencies and document\nthe pin-refresh process in the README.\n\n## Why\nAn unpinned transitive upgrade broke local dev for a teammate this\nweek.\n\n## Risk\nLow. Current installed versions are well within the new bounds.",
+   "draft": false,
+   "labels": [],
+   "commit": {
+    "subject": "DEMO-0005 Pin dependency upper bounds",
+    "body": "What: Add upper bounds to the pandas and pydantic dependencies and\ndocument the pin-refresh process in the README.\nWhy: An unpinned transitive upgrade broke local dev for a teammate\nthis week.\nRisk: Low. Current installed versions are well within the new bounds."
+   },
+   "files": {
+    "README.md": "# acme-energy-data\n\n> **This is a demo.** Acme Energy is fictional. This repository is the sample workspace for\n> [orch-core](https://github.com/severinlindenmann/orch-core): local Markdown tickets with human approvals for agent\n> work, plus Mission Control, its dashboard. Tickets live in `orchestrator/`; `AGENTS.md` has the working rules.\n>\n> - Install the plugin: `claude plugin marketplace add severinlindenmann/orch-core`, then\n>   `claude plugin install orch-core@orch-core` (`.claude/settings.json` already names that marketplace).\n> - Sub-repos: [orch-demo-ingest](https://github.com/severinlindenmann/orch-demo-ingest),\n>   [orch-demo-dbt](https://github.com/severinlindenmann/orch-demo-dbt) and\n>   [orch-demo-infra](https://github.com/severinlindenmann/orch-demo-infra), cloned as `ingest/`, `dbt/` and `infra/`:\n>   `uv run --project <orch-core>/plugins/orch-core python scripts/seed/seed.py repos --apply`\n>   (or `git clone https://github.com/severinlindenmann/orch-demo-ingest ingest`, and the same for `dbt` and `infra`).\n> - The demo data (issues, PRs, wiki, tickets) is rebuilt by `scripts/seed/`; see `scripts/seed/README.md`.\n\nInternal data platform for Acme Energy's smart-meter ingestion pipeline.\n\n## What this is\n\nThis repository holds the batch jobs that:\n\n1. **Ingest** raw interval-read exports from substation gateways (`src/acme/ingest.py`).\n2. **Transform** raw reads into the canonical `meter_reads` fact shape (`src/acme/transform.py`).\n3. **Check data quality** before publishing to the warehouse (`src/acme/quality.py`).\n\nDownstream SQL models that build on top of the published tables live in `sql/`.\n\n## Layout\n\n```\nsrc/acme/\n  ingest.py       # pull + parse raw gateway exports\n  transform.py    # normalize into the meter_reads fact table\n  quality.py      # quality gate rules (nulls, range, duplicates)\n  config.py       # pipeline configuration\n  models.py       # shared dataclasses / pydantic models\n  utils.py        # small shared helpers\ntests/            # pytest unit tests\nsql/staging/      # staging models (1:1 with source tables)\nsql/marts/        # curated marts for reporting\n```\n\n## Development\n\n```bash\npip install -e .[dev]\npytest -q\n```\n\n## Dependency pins\n\nDirect dependencies carry an upper bound (see `pyproject.toml`). Bump the\nupper bound deliberately in its own PR, run the full test suite, and only\nthen widen it, rather than letting a transitive upgrade land unreviewed.\n\n## CI\n\nGitHub Actions runs `pytest -q` against Python 3.11 on every push and pull request (see\n`.github/workflows/ci.yml`).\n",
+    "pyproject.toml": "[build-system]\nrequires = [\"setuptools>=68\", \"wheel\"]\nbuild-backend = \"setuptools.build_meta\"\n\n[project]\nname = \"acme-energy-data\"\nversion = \"0.1.0\"\ndescription = \"Ingestion, transformation and quality checks for Acme Energy's meter data platform.\"\nreadme = \"README.md\"\nrequires-python = \">=3.11\"\nlicense = { text = \"Proprietary\" }\ndependencies = [\n    \"pandas>=2.1,<2.3\",\n    \"pydantic>=2.5,<2.9\",\n]\n\n[project.optional-dependencies]\ndev = [\n    \"pytest>=7.4\",\n    \"pytest-cov>=4.1\",\n    \"ruff>=0.4\",\n]\n\n[tool.setuptools.packages.find]\nwhere = [\"src\"]\n\n[tool.pytest.ini_options]\ntestpaths = [\"tests\"]\n"
+   },
+   "comment": null,
+   "merge": false,
+   "close": false
+  },
+  {
+   "number": 19,
+   "branch": "feature/DEMO-0001-retry-gateway-downloads",
+   "title": "DEMO-0001 Add retry with backoff for gateway downloads",
+   "body": "Closes #1\n\nLocal ticket: DEMO-0001\n\n## What\nNew `fetch_with_retry` helper retries a flaky download callable up to\n`max_attempts` times with linear backoff, logging each failed attempt\nand the gateway id.\n\n## Why\nThe nightly pull from substation gateways times out intermittently\n(roughly 1 in 40 runs) and today a timeout fails the whole job with no\nretry.\n\n## Risk\nLow. Purely additive; not yet wired into the nightly job runner, which\nis out of scope for this change.",
+   "draft": false,
+   "labels": [
+    "review:approved"
+   ],
+   "commit": {
+    "subject": "DEMO-0001 Add retry with backoff for gateway downloads",
+    "body": "What: New fetch_with_retry helper retries a flaky download callable up\nto max_attempts times with linear backoff, logging each failed\nattempt and the gateway id.\nWhy: The nightly pull from substation gateways times out\nintermittently (~1 in 40 runs) and today a timeout fails the whole\njob with no retry.\nRisk: Low. Purely additive; not yet wired into the nightly job runner,\nwhich is out of scope for this change."
+   },
+   "files": {
+    "src/acme/ingest.py": "\"\"\"Ingest raw interval-read exports from substation gateways.\"\"\"\nfrom __future__ import annotations\n\nimport csv\nimport logging\nfrom datetime import datetime\nfrom pathlib import Path\n\nfrom acme.models import RawMeterRead\n\nlogger = logging.getLogger(__name__)\n\n_ALT_TIMESTAMP_FORMAT = \"%d/%m/%Y %H:%M\"\n\n\ndef _parse_timestamp(value: str) -> str:\n    \"\"\"Normalize a gateway timestamp to ISO 8601.\n\n    Most gateways emit ISO 8601 already, which pydantic parses directly.\n    A couple of substations (GW-04, GW-11) emit `DD/MM/YYYY HH:MM`\n    instead; this coerces that alternate format to ISO 8601 so it\n    validates the same way.\n    \"\"\"\n    try:\n        datetime.fromisoformat(value.replace(\"Z\", \"+00:00\"))\n        return value\n    except ValueError:\n        parsed = datetime.strptime(value, _ALT_TIMESTAMP_FORMAT)\n        return parsed.isoformat()\n\n\ndef parse_gateway_export(path: Path) -> list[RawMeterRead]:\n    \"\"\"Parse one gateway export CSV into a list of `RawMeterRead`.\n\n    Gateway exports are plain CSV with columns:\n    `meter_id, gateway_id, read_at, kwh`.\n\n    A row that fails to parse (bad numeric value, missing column, ...) is\n    skipped and logged rather than aborting the whole file - one bad row\n    from a flaky gateway should not cost us the rest of the day's reads.\n    \"\"\"\n    reads: list[RawMeterRead] = []\n    with path.open(newline=\"\") as fh:\n        reader = csv.DictReader(fh)\n        for line_no, row in enumerate(reader, start=2):  # header is line 1\n            try:\n                reads.append(\n                    RawMeterRead(\n                        meter_id=row[\"meter_id\"],\n                        gateway_id=row[\"gateway_id\"],\n                        read_at=_parse_timestamp(row[\"read_at\"]),\n                        kwh=float(row[\"kwh\"]),\n                    )\n                )\n            except (KeyError, ValueError, TypeError) as exc:\n                logger.warning(\n                    \"skipping malformed row %s:%d (%s): %s\", path.name, line_no, row, exc\n                )\n    return reads\n\n\ndef load_gateway_exports(export_dir: Path) -> list[RawMeterRead]:\n    \"\"\"Parse every `.csv` export found directly under `export_dir`.\"\"\"\n    reads: list[RawMeterRead] = []\n    for csv_path in sorted(export_dir.glob(\"*.csv\")):\n        reads.extend(parse_gateway_export(csv_path))\n    return reads\n\n\ndef fetch_with_retry(download_fn, gateway_id: str, max_attempts: int = 3):\n    \"\"\"Call `download_fn()` with retries, for flaky gateway connections.\n\n    `download_fn` takes no arguments and either returns the downloaded\n    payload or raises. Retries up to `max_attempts` times with a short\n    linear backoff between attempts, then re-raises the last error.\n    \"\"\"\n    import time\n\n    last_exc: Exception | None = None\n    for attempt in range(1, max_attempts + 1):\n        try:\n            return download_fn()\n        except Exception as exc:  # noqa: BLE001 - deliberately broad, network layer varies\n            last_exc = exc\n            logger.warning(\n                \"download from %s failed (attempt %d/%d): %s\",\n                gateway_id,\n                attempt,\n                max_attempts,\n                exc,\n            )\n            if attempt < max_attempts:\n                time.sleep(0.5 * attempt)\n    logger.error(\"giving up on %s after %d attempts\", gateway_id, max_attempts)\n    assert last_exc is not None\n    raise last_exc\n",
+    "tests/test_ingest_retry.py": "from __future__ import annotations\n\nimport pytest\n\nfrom acme.ingest import fetch_with_retry\n\n\ndef test_fetch_with_retry_succeeds_after_transient_failures():\n    calls = {\"n\": 0}\n\n    def flaky():\n        calls[\"n\"] += 1\n        if calls[\"n\"] < 3:\n            raise TimeoutError(\"gateway timeout\")\n        return \"payload\"\n\n    result = fetch_with_retry(flaky, gateway_id=\"GW-03\", max_attempts=3)\n    assert result == \"payload\"\n    assert calls[\"n\"] == 3\n\n\ndef test_fetch_with_retry_reraises_after_exhausting_attempts():\n    def always_fails():\n        raise TimeoutError(\"gateway timeout\")\n\n    with pytest.raises(TimeoutError):\n        fetch_with_retry(always_fails, gateway_id=\"GW-03\", max_attempts=2)\n"
+   },
+   "comment": "Looks solid — nice to see the backoff covered by a test with a fake flaky callable. One nit: once this gets wired into the nightly runner, let's make max_attempts configurable from PipelineConfig rather than a hardcoded default, but that can be a follow-up. Approving conceptually (I can't formally approve my own org's PR here, noting it as approved for the demo).",
+   "merge": false,
+   "close": false
+  },
+  {
+   "number": 20,
+   "branch": "fix/DEMO-0002-suspect-threshold-by-meter-type",
+   "title": "DEMO-0002 Vary suspect-read threshold by meter type",
+   "body": "Closes #3\n\nLocal ticket: DEMO-0002\n\n## What\n`PipelineConfig` gains per meter-type suspect thresholds\n(residential/commercial/industrial) via `threshold_for()`, with the\nexisting `max_interval_kwh` as fallback for unknown types.\n`normalize_reads` uses it instead of the single global constant.\n\n## Why\nIndustrial meters legitimately exceed 50 kWh per 15-minute interval,\nwhich was generating a steady stream of false-positive suspect flags\nfor that meter class.\n\n## Risk\nLow. Reads without a `meter_type` keep today's behavior exactly; only\nreads tagged industrial/commercial get a different threshold.",
+   "draft": false,
+   "labels": [
+    "review:changes-requested"
+   ],
+   "commit": {
+    "subject": "DEMO-0002 Vary suspect-read threshold by meter type",
+    "body": "What: PipelineConfig gains per meter-type suspect thresholds\n(residential/commercial/industrial) via threshold_for(), with the\nexisting max_interval_kwh as fallback for unknown types.\nnormalize_reads uses it instead of the single global constant.\nWhy: Industrial meters legitimately exceed 50 kWh per 15-minute\ninterval, which was generating a steady stream of false-positive\nsuspect flags for that meter class.\nRisk: Low. Reads without a meter_type keep today's behavior exactly;\nonly reads tagged industrial/commercial get a different threshold."
+   },
+   "files": {
+    "src/acme/config.py": "\"\"\"Pipeline configuration for the Acme Energy meter-read pipeline.\"\"\"\nfrom __future__ import annotations\n\nfrom dataclasses import dataclass, field\n\n\n#: Per meter-type override of the suspect-value threshold. Industrial\n#: meters legitimately draw well above the residential default.\nDEFAULT_SUSPECT_THRESHOLDS: dict[str, float] = {\n    \"residential\": 50.0,\n    \"commercial\": 150.0,\n    \"industrial\": 1000.0,\n}\n\n\n@dataclass(frozen=True)\nclass PipelineConfig:\n    \"\"\"Static configuration for a single ingest run.\"\"\"\n\n    gateway_export_dir: str = \"data/raw/gateway_exports\"\n    staging_table: str = \"stg_meter_reads\"\n    fact_table: str = \"fct_meter_reads\"\n    max_interval_kwh: float = 50.0\n    \"\"\"Readings above this threshold for a 15-minute interval are flagged as suspect.\n\n    Used as the fallback when a read has no known meter type; see\n    `suspect_thresholds` for the per meter-type overrides.\n    \"\"\"\n    suspect_thresholds: dict[str, float] = field(\n        default_factory=lambda: dict(DEFAULT_SUSPECT_THRESHOLDS)\n    )\n    allowed_late_days: int = 3\n    \"\"\"How many days late a gateway export may arrive before it is rejected outright.\"\"\"\n\n    def threshold_for(self, meter_type: str | None) -> float:\n        \"\"\"Suspect threshold for `meter_type`, or the global default if unknown.\"\"\"\n        if meter_type is None:\n            return self.max_interval_kwh\n        return self.suspect_thresholds.get(meter_type, self.max_interval_kwh)\n\n\nDEFAULT_CONFIG = PipelineConfig()\n",
+    "src/acme/models.py": "\"\"\"Shared data shapes used across the ingest/transform/quality pipeline.\"\"\"\nfrom __future__ import annotations\n\nfrom datetime import datetime\n\nfrom pydantic import BaseModel, Field\n\n\nclass RawMeterRead(BaseModel):\n    \"\"\"One interval read as it arrives from a substation gateway export.\"\"\"\n\n    meter_id: str\n    gateway_id: str\n    read_at: datetime\n    kwh: float = Field(ge=0)\n    meter_type: str | None = None\n    quality_flag: str | None = None\n\n\nclass MeterRead(BaseModel):\n    \"\"\"A normalized meter read, ready for the fact table.\"\"\"\n\n    meter_id: str\n    read_at: datetime\n    kwh: float\n    is_suspect: bool = False\n    source_gateway_id: str\n",
+    "src/acme/transform.py": "\"\"\"Transform raw gateway reads into the canonical meter_reads fact shape.\"\"\"\nfrom __future__ import annotations\n\nfrom acme.config import PipelineConfig\nfrom acme.models import MeterRead, RawMeterRead\n\n\ndef normalize_reads(\n    raw_reads: list[RawMeterRead], config: PipelineConfig\n) -> list[MeterRead]:\n    \"\"\"Convert raw reads into normalized `MeterRead` rows.\n\n    Readings above `config.max_interval_kwh` are kept but marked suspect\n    rather than dropped, so quality checks downstream can decide what to\n    do with them.\n    \"\"\"\n    normalized: list[MeterRead] = []\n    for raw in raw_reads:\n        threshold = config.threshold_for(raw.meter_type)\n        normalized.append(\n            MeterRead(\n                meter_id=raw.meter_id,\n                read_at=raw.read_at,\n                kwh=raw.kwh,\n                is_suspect=raw.kwh > threshold,\n                source_gateway_id=raw.gateway_id,\n            )\n        )\n    return normalized\n\n\ndef dedupe_reads(reads: list[MeterRead]) -> list[MeterRead]:\n    \"\"\"Drop duplicate (meter_id, read_at) rows, keeping the first occurrence.\"\"\"\n    seen: set[tuple[str, object]] = set()\n    deduped: list[MeterRead] = []\n    for read in reads:\n        key = (read.meter_id, read.read_at)\n        if key in seen:\n            continue\n        seen.add(key)\n        deduped.append(read)\n    return deduped\n",
+    "tests/test_meter_type_thresholds.py": "from __future__ import annotations\n\nfrom datetime import datetime, timezone\n\nfrom acme.config import PipelineConfig\nfrom acme.models import RawMeterRead\nfrom acme.transform import normalize_reads\n\n\ndef test_threshold_for_known_and_unknown_meter_types():\n    config = PipelineConfig()\n    assert config.threshold_for(\"residential\") == 50.0\n    assert config.threshold_for(\"industrial\") == 1000.0\n    assert config.threshold_for(\"unknown-type\") == config.max_interval_kwh\n    assert config.threshold_for(None) == config.max_interval_kwh\n\n\ndef test_normalize_reads_uses_per_meter_type_threshold():\n    config = PipelineConfig()\n    raw = [\n        RawMeterRead(\n            meter_id=\"MTR-100\",\n            gateway_id=\"GW-20\",\n            read_at=datetime(2026, 9, 1, tzinfo=timezone.utc),\n            kwh=600.0,\n            meter_type=\"industrial\",\n        ),\n        RawMeterRead(\n            meter_id=\"MTR-101\",\n            gateway_id=\"GW-20\",\n            read_at=datetime(2026, 9, 1, tzinfo=timezone.utc),\n            kwh=60.0,\n            meter_type=\"residential\",\n        ),\n    ]\n    normalized = normalize_reads(raw, config)\n    by_id = {r.meter_id: r for r in normalized}\n    assert by_id[\"MTR-100\"].is_suspect is False\n    assert by_id[\"MTR-101\"].is_suspect is True\n"
+   },
+   "comment": "Two requested changes before merge:\n1. Please also expose the per meter-type thresholds in the mart layer docs (sql/marts), not just the code — on-call will need to know why industrial meters don't trigger suspect flags at the same level.\n2. Can we get a test for an explicitly unknown meter_type string (not just None) to make sure it falls back correctly?",
+   "merge": false,
+   "close": false
+  },
+  {
+   "number": 21,
+   "branch": "fix/DEMO-0003-quality-divide-by-zero",
+   "title": "DEMO-0003 Guard suspect-rate summary against zero rows",
+   "body": "Closes #5\n\nLocal ticket: DEMO-0003\n\n## What\nAdd `suspect_rate_percent()` with an explicit zero-rows guard, for the\non-call summary line that previously computed the rate inline and\ncould divide by zero.\n\n## Why\nAn empty gateway-export day (holiday, outage) was paging on-call with\na `ZeroDivisionError` instead of a clean zero-valued report.\n\n## Risk\nLow in production.\n\n**Known failing case for this demo:** `tests/test_quality_zero_rows.py`\nintentionally asserts the wrong expected value so this PR shows a red\nCI check.",
+   "draft": false,
+   "labels": [],
+   "commit": {
+    "subject": "DEMO-0003 Guard suspect-rate summary against zero rows",
+    "body": "What: Add suspect_rate_percent() with an explicit zero-rows guard, for\nthe on-call summary line that previously computed the rate inline and\ncould divide by zero.\nWhy: An empty gateway-export day (holiday, outage) was paging on-call\nwith a ZeroDivisionError instead of a clean zero-valued report.\nRisk: Low in production; note this PR intentionally ships with a\nfailing test for the demo, see PR body."
+   },
+   "files": {
+    "src/acme/quality.py": "\"\"\"Quality gate rules applied before publishing meter_reads to the warehouse.\"\"\"\nfrom __future__ import annotations\n\nfrom dataclasses import dataclass\n\nfrom acme.models import MeterRead\n\n\n@dataclass\nclass QualityReport:\n    total_rows: int\n    suspect_rows: int\n    duplicate_rows: int\n    null_meter_ids: int\n\n    @property\n    def suspect_rate(self) -> float:\n        if self.total_rows == 0:\n            return 0.0\n        return self.suspect_rows / self.total_rows\n\n    def passed(self, max_suspect_rate: float = 0.05) -> bool:\n        return self.null_meter_ids == 0 and self.suspect_rate <= max_suspect_rate\n\n\ndef suspect_rate_percent(report: QualityReport) -> float:\n    \"\"\"Suspect rate as a percentage, for the on-call summary line.\n\n    Guards the zero-rows case explicitly rather than relying on the\n    caller to check `total_rows` first.\n    \"\"\"\n    if report.total_rows == 0:\n        return 0.0\n    return 100 * report.suspect_rows / report.total_rows\n\n\ndef build_quality_report(reads: list[MeterRead]) -> QualityReport:\n    seen: set[tuple[str, object]] = set()\n    duplicates = 0\n    null_ids = 0\n    suspect = 0\n    for read in reads:\n        if not read.meter_id:\n            null_ids += 1\n        key = (read.meter_id, read.read_at)\n        if key in seen:\n            duplicates += 1\n        else:\n            seen.add(key)\n        if read.is_suspect:\n            suspect += 1\n    return QualityReport(\n        total_rows=len(reads),\n        suspect_rows=suspect,\n        duplicate_rows=duplicates,\n        null_meter_ids=null_ids,\n    )\n",
+    "tests/test_quality_zero_rows.py": "from __future__ import annotations\n\nfrom acme.quality import QualityReport, suspect_rate_percent\n\n\ndef test_suspect_rate_percent_on_empty_report():\n    report = QualityReport(\n        total_rows=0, suspect_rows=0, duplicate_rows=0, null_meter_ids=0\n    )\n    # Known failing case for the demo: this asserts the wrong expected\n    # value on purpose, to show a red CI check (see PR body).\n    assert suspect_rate_percent(report) == 1.0\n\n\ndef test_suspect_rate_percent_normal_case():\n    report = QualityReport(\n        total_rows=20, suspect_rows=2, duplicate_rows=0, null_meter_ids=0\n    )\n    assert suspect_rate_percent(report) == 10.0\n"
+   },
+   "comment": null,
+   "merge": false,
+   "close": false
+  },
+  {
+   "number": 22,
+   "branch": "feature/DEMO-0004-coverage-reporting",
+   "title": "DEMO-0004 Add coverage reporting to CI (WIP)",
+   "body": "Closes #4\n\nLocal ticket: DEMO-0004\n\n## What\nCI now runs `pytest --cov=acme --cov-report=term-missing` instead of\nplain `pytest -q`.\n\n## Why\nWe have no visibility into which modules are under-tested as the\npipeline grows.\n\n## Risk\nNone, CI-only change.\n\nStill draft: deciding whether to add a hard coverage gate (and what\nthreshold) in a follow-up before marking this ready.",
+   "draft": true,
+   "labels": [],
+   "commit": {
+    "subject": "DEMO-0004 Add coverage reporting to CI (WIP)",
+    "body": "What: CI now runs pytest with --cov=acme --cov-report=term-missing\ninstead of plain pytest -q.\nWhy: We have no visibility into which modules are under-tested as the\npipeline grows.\nRisk: None, CI-only change. Still deciding whether to add a hard\ncoverage gate in a follow-up, hence draft."
+   },
+   "files": {
+    ".github/workflows/ci.yml": "name: CI\n\non:\n  push:\n    branches: [main]\n  pull_request:\n\njobs:\n  test:\n    runs-on: ubuntu-latest\n    steps:\n      - uses: actions/checkout@v4\n\n      - name: Set up Python 3.11\n        uses: actions/setup-python@v5\n        with:\n          python-version: \"3.11\"\n\n      - name: Install package\n        run: pip install -e .[dev]\n\n      - name: Run tests with coverage\n        run: pytest -q --cov=acme --cov-report=term-missing\n"
+   },
+   "comment": null,
+   "merge": false,
+   "close": false
+  },
+  {
+   "number": 23,
+   "branch": "feature/DEMO-0009-late-arriving-exports",
+   "title": "DEMO-0009 Reject gateway exports past the allowed late window",
+   "body": "Closes #9\n\nLocal ticket: DEMO-0009\n\n## What\nNew `check_export_age()` compares an export's date to the run date:\naccepts on-time exports, logs and accepts late-but-allowed ones, and\nraises `ExportTooLateError` beyond `allowed_late_days`.\n\n## Why\n`allowed_late_days` existed in config but nothing enforced it, so late\nfiles were ingested silently; one caused a stale mart with no warning\nin the past.\n\n## Risk\nLow. Not yet wired into the nightly runner's main loop; this PR adds\nthe check function and its tests only.",
+   "draft": false,
+   "labels": [],
+   "commit": {
+    "subject": "DEMO-0009 Reject gateway exports past the allowed late window",
+    "body": "What: New check_export_age() compares an export's date to the run\ndate; accepts on-time exports, logs and accepts late-but-allowed\nones, and raises ExportTooLateError beyond allowed_late_days.\nWhy: allowed_late_days existed in config but nothing enforced it,\nso late files were ingested silently; one caused a stale mart with\nno warning in the past.\nRisk: Low. Not yet wired into the nightly runner's main loop; this PR\nadds the check function and its tests only."
+   },
+   "files": {
+    "src/acme/ingest.py": "\"\"\"Ingest raw interval-read exports from substation gateways.\"\"\"\nfrom __future__ import annotations\n\nimport csv\nimport logging\nfrom datetime import datetime\nfrom pathlib import Path\n\nfrom acme.config import PipelineConfig\nfrom acme.models import RawMeterRead\n\nlogger = logging.getLogger(__name__)\n\n_ALT_TIMESTAMP_FORMAT = \"%d/%m/%Y %H:%M\"\n\n\ndef _parse_timestamp(value: str) -> str:\n    \"\"\"Normalize a gateway timestamp to ISO 8601.\n\n    Most gateways emit ISO 8601 already, which pydantic parses directly.\n    A couple of substations (GW-04, GW-11) emit `DD/MM/YYYY HH:MM`\n    instead; this coerces that alternate format to ISO 8601 so it\n    validates the same way.\n    \"\"\"\n    try:\n        datetime.fromisoformat(value.replace(\"Z\", \"+00:00\"))\n        return value\n    except ValueError:\n        parsed = datetime.strptime(value, _ALT_TIMESTAMP_FORMAT)\n        return parsed.isoformat()\n\n\ndef parse_gateway_export(path: Path) -> list[RawMeterRead]:\n    \"\"\"Parse one gateway export CSV into a list of `RawMeterRead`.\n\n    Gateway exports are plain CSV with columns:\n    `meter_id, gateway_id, read_at, kwh`.\n\n    A row that fails to parse (bad numeric value, missing column, ...) is\n    skipped and logged rather than aborting the whole file - one bad row\n    from a flaky gateway should not cost us the rest of the day's reads.\n    \"\"\"\n    reads: list[RawMeterRead] = []\n    with path.open(newline=\"\") as fh:\n        reader = csv.DictReader(fh)\n        for line_no, row in enumerate(reader, start=2):  # header is line 1\n            try:\n                reads.append(\n                    RawMeterRead(\n                        meter_id=row[\"meter_id\"],\n                        gateway_id=row[\"gateway_id\"],\n                        read_at=_parse_timestamp(row[\"read_at\"]),\n                        kwh=float(row[\"kwh\"]),\n                    )\n                )\n            except (KeyError, ValueError, TypeError) as exc:\n                logger.warning(\n                    \"skipping malformed row %s:%d (%s): %s\", path.name, line_no, row, exc\n                )\n    return reads\n\n\nclass ExportTooLateError(Exception):\n    \"\"\"Raised when a gateway export arrives past the allowed late window.\"\"\"\n\n\ndef check_export_age(\n    export_date: datetime, run_date: datetime, config: PipelineConfig\n) -> bool:\n    \"\"\"Check how late `export_date` is relative to `run_date`.\n\n    Returns True if the export is late but still within\n    `config.allowed_late_days`. Raises `ExportTooLateError` if it is\n    older than that window. Returns False for an on-time export.\n    \"\"\"\n    age_days = (run_date.date() - export_date.date()).days\n    if age_days <= 0:\n        return False\n    if age_days > config.allowed_late_days:\n        raise ExportTooLateError(\n            f\"export for {export_date.date()} is {age_days} days late \"\n            f\"(allowed: {config.allowed_late_days})\"\n        )\n    logger.warning(\"accepting late export for %s (%d days late)\", export_date.date(), age_days)\n    return True\n\n\ndef load_gateway_exports(export_dir: Path) -> list[RawMeterRead]:\n    \"\"\"Parse every `.csv` export found directly under `export_dir`.\"\"\"\n    reads: list[RawMeterRead] = []\n    for csv_path in sorted(export_dir.glob(\"*.csv\")):\n        reads.extend(parse_gateway_export(csv_path))\n    return reads\n",
+    "tests/test_export_age.py": "from __future__ import annotations\n\nfrom datetime import datetime, timezone\n\nimport pytest\n\nfrom acme.config import PipelineConfig\nfrom acme.ingest import ExportTooLateError, check_export_age\n\n\ndef test_on_time_export_is_not_late():\n    config = PipelineConfig()\n    export_date = datetime(2026, 9, 1, tzinfo=timezone.utc)\n    run_date = datetime(2026, 9, 1, tzinfo=timezone.utc)\n    assert check_export_age(export_date, run_date, config) is False\n\n\ndef test_late_but_allowed_export_is_accepted():\n    config = PipelineConfig(allowed_late_days=3)\n    export_date = datetime(2026, 9, 1, tzinfo=timezone.utc)\n    run_date = datetime(2026, 9, 3, tzinfo=timezone.utc)\n    assert check_export_age(export_date, run_date, config) is True\n\n\ndef test_too_late_export_is_rejected():\n    config = PipelineConfig(allowed_late_days=3)\n    export_date = datetime(2026, 9, 1, tzinfo=timezone.utc)\n    run_date = datetime(2026, 9, 10, tzinfo=timezone.utc)\n    with pytest.raises(ExportTooLateError):\n        check_export_age(export_date, run_date, config)\n"
+   },
+   "comment": "Good catch on the silent gap. Question: should check_export_age also account for weekends/holidays when computing age_days, or is calendar-day age intentional here? If intentional, worth a one-line comment in the docstring so the next reader doesn't \"fix\" it.",
+   "merge": false,
+   "close": false
+  },
+  {
+   "number": 24,
+   "branch": "chore/DEMO-0008-dbt-vs-plain-sql-decision",
+   "title": "DEMO-0008 Document dbt-vs-plain-SQL spike outcome",
+   "body": "Closes #2\n\nLocal ticket: DEMO-0008\n\n## What\nAdd `sql/README.md` summarizing the dbt-core vs. plain SQL spike and\nthe decision to stick with the current runner for now.\n\n## Why\nCapture the reasoning so it does not need to be re-litigated next time\nsomeone proposes adopting dbt.\n\n## Risk\nNone, documentation only.",
+   "draft": false,
+   "labels": [],
+   "commit": {
+    "subject": "DEMO-0008 Document dbt-vs-plain-SQL spike outcome",
+    "body": "What: Add sql/README.md summarizing the dbt-core vs. plain SQL spike\nand the decision to stick with the current runner for now.\nWhy: Capture the reasoning so it does not need to be re-litigated\nnext time someone proposes adopting dbt.\nRisk: None, documentation only."
+   },
+   "files": {
+    "sql/README.md": "# sql/\n\nPlain SQL models with Jinja-style `{{ source(...) }}` / `{{ ref(...) }}`\nplaceholders, run today by a thin in-house runner (not dbt).\n\n## dbt vs. plain SQL (spike notes, DEMO-0008)\n\nWe looked at adopting dbt-core for `staging/` and `marts/`. Draft\nfindings:\n\n- dbt would buy us `ref()`/`source()` resolution, docs generation and\n  `dbt test` for free, instead of our hand-rolled runner.\n- Migration cost for the 4 existing models is small, but we'd also\n  need to stand up a `profiles.yml` per environment and CI changes.\n- Decision: **not now.** Revisit once we have more than ~10 models;\n  today the overhead isn't worth it for 4 files.\n\nSee issue #2 for the full discussion.\n"
+   },
+   "comment": "Closing without merging: folding this write-up into a comment on #2 instead of a standalone doc file, so we don't carry an sql/README.md that goes stale. Decision (no dbt for now) stands.",
+   "merge": false,
+   "close": true
+  }
+ ],
+ "main_commits": [
+  {
+   "subject": "DEMO-0005 Exclude broken pandas 2.2.0 release",
+   "body": "What: Dependency spec now excludes pandas 2.2.0 (a known-broken patch\nrelease) and bumps the minimum pydantic to 2.6 for a groupby fix we\nrely on.\nWhy: 2.2.0 regressed a groupby edge case our transform step hits on\nsparse gateway data; 2.6 has the pydantic fix for validating\nalternate timestamp strings we now depend on.\nRisk: Low. Narrow exclusion plus a small minimum bump.",
+   "files": {
+    "pyproject.toml": "[build-system]\nrequires = [\"setuptools>=68\", \"wheel\"]\nbuild-backend = \"setuptools.build_meta\"\n\n[project]\nname = \"acme-energy-data\"\nversion = \"0.1.0\"\ndescription = \"Ingestion, transformation and quality checks for Acme Energy's meter data platform.\"\nreadme = \"README.md\"\nrequires-python = \">=3.11\"\nlicense = { text = \"Proprietary\" }\ndependencies = [\n    \"pandas>=2.1,!=2.2.0\",\n    \"pydantic>=2.6\",\n]\n\n[project.optional-dependencies]\ndev = [\n    \"pytest>=7.4\",\n    \"pytest-cov>=4.1\",\n    \"ruff>=0.4\",\n]\n\n[tool.setuptools.packages.find]\nwhere = [\"src\"]\n\n[tool.pytest.ini_options]\ntestpaths = [\"tests\"]\n"
+   }
+  }
+ ]
+}

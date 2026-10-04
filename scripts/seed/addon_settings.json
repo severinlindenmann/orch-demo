@@ -1,0 +1,15 @@
+{
+  "github-reviews": {},
+  "github-issues": {"default_filter": "mine"},
+  "databricks": {
+    "envs": {
+      "dev": "acme_dev @ https://adb-5555555555555555.15.azuredatabricks.net",
+      "int": "simulated:int",
+      "prod": "simulated:prod"
+    },
+    "scope": "prefix",
+    "prefixes": "[dev demo] acme-",
+    "demo": true
+  },
+  "wiki": {"provider": "github-wiki", "repos": ""}
+}
