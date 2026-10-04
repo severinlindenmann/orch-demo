@@ -6,9 +6,9 @@ priority: normal
 size: s
 status: backlog
 created: 2026-10-02T07:43Z
-updated: 2026-10-02T07:47Z
+updated: 2026-10-02T07:48Z
 external:
-- key: '8'
+- key: GH-8
   url: https://github.com/severinlindenmann/orch-demo/issues/8
 repos: []
 branches: {}
@@ -41,29 +41,8 @@ sessions: []
 
 # DEMO-0011 — Add tests for the meter master staging model
 
-## Ask
-
-## Context
-
-## Requirements
-
-## Acceptance criteria
-
-## Out of scope
-
-## Proposal
-
-## Plan
-
-## Current state
-
-## Verification
-
-## Decisions
-
 ## Log
 
 - 2026-10-02T07:43Z [claude-code cc8b] created
 - 2026-10-02T07:47Z [claude-code cc8b] Drafting requirements; not yet ready for the human to approve.
-
-## Findings
+- 2026-10-02T07:48Z [you] edited the ticket file

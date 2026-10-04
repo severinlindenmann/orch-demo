@@ -1,0 +1,87 @@
+{
+  "issues": {
+    "i16": 25,
+    "i17": 26,
+    "i18": 27,
+    "i19": 28,
+    "i20": 29,
+    "i21": 30,
+    "i22": 31,
+    "i23": 32,
+    "i24": 33,
+    "i25": 34,
+    "i26": 35,
+    "i27": 36,
+    "i28": 37,
+    "i29": 38,
+    "n1": 39,
+    "n2": 40,
+    "n3": 41
+  },
+  "prs": {
+    "dbt:chore/snake-case-columns": {
+      "number": 4,
+      "url": "https://github.com/severinlindenmann/orch-demo-dbt/pull/4"
+    },
+    "dbt:chore/source-freshness": {
+      "number": 2,
+      "url": "https://github.com/severinlindenmann/orch-demo-dbt/pull/2"
+    },
+    "dbt:explore/dbt-utils-macros": {
+      "number": 3,
+      "url": "https://github.com/severinlindenmann/orch-demo-dbt/pull/3"
+    },
+    "dbt:feature/DEMO-0021-meter-type-dim": {
+      "number": 1,
+      "url": "https://github.com/severinlindenmann/orch-demo-dbt/pull/1"
+    },
+    "dbt:feature/DEMO-0026-incremental-reads": {
+      "number": 6,
+      "url": "https://github.com/severinlindenmann/orch-demo-dbt/pull/6"
+    },
+    "dbt:feature/DEMO-0028-dst-days": {
+      "number": 5,
+      "url": "https://github.com/severinlindenmann/orch-demo-dbt/pull/5"
+    },
+    "infra:chore/DEMO-0025-cost-center-tags": {
+      "number": 1,
+      "url": "https://github.com/severinlindenmann/orch-demo-infra/pull/1"
+    },
+    "infra:chore/default-tags": {
+      "number": 2,
+      "url": "https://github.com/severinlindenmann/orch-demo-infra/pull/2"
+    },
+    "infra:chore/rename-int-workspace": {
+      "number": 5,
+      "url": "https://github.com/severinlindenmann/orch-demo-infra/pull/5"
+    },
+    "infra:chore/serverless-defaults": {
+      "number": 4,
+      "url": "https://github.com/severinlindenmann/orch-demo-infra/pull/4"
+    },
+    "infra:feature/DEMO-0019-ingest-service-job": {
+      "number": 3,
+      "url": "https://github.com/severinlindenmann/orch-demo-infra/pull/3"
+    },
+    "ingest:chore/raise-download-timeout": {
+      "number": 5,
+      "url": "https://github.com/severinlindenmann/orch-demo-ingest/pull/5"
+    },
+    "ingest:feature/DEMO-0019-gateway-client": {
+      "number": 2,
+      "url": "https://github.com/severinlindenmann/orch-demo-ingest/pull/2"
+    },
+    "ingest:fix/DEMO-0020-handle-429": {
+      "number": 1,
+      "url": "https://github.com/severinlindenmann/orch-demo-ingest/pull/1"
+    },
+    "ingest:fix/DEMO-0027-empty-export": {
+      "number": 4,
+      "url": "https://github.com/severinlindenmann/orch-demo-ingest/pull/4"
+    },
+    "ingest:wip/structured-logging": {
+      "number": 3,
+      "url": "https://github.com/severinlindenmann/orch-demo-ingest/pull/3"
+    }
+  }
+}

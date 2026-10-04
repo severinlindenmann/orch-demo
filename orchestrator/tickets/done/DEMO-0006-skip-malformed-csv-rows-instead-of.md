@@ -6,9 +6,9 @@ priority: high
 size: s
 status: done
 created: 2026-10-02T07:43Z
-updated: 2026-10-02T07:47Z
+updated: 2026-10-02T07:48Z
 external:
-- key: '7'
+- key: GH-7
   url: https://github.com/severinlindenmann/orch-demo/issues/7
 repos:
 - acme-energy-data
@@ -50,10 +50,6 @@ sessions:
 
 # DEMO-0006 — Skip malformed CSV rows instead of aborting the file
 
-## Ask
-
-## Context
-
 ## Requirements
 
 - A single malformed row in a gateway export must not abort the whole file.
@@ -69,23 +65,17 @@ sessions:
 
 - Alerting on a sustained rate of malformed rows (separate ticket if it recurs).
 
-## Proposal
-
 ## Plan
 
 1. Wrap the per-row parse in try/except in parse_gateway_export.
 2. Log a warning with file name, line number and the row contents on failure.
 3. Regression test: 3-row file with 1 malformed row in the middle.
 
-## Current state
-
 ## Verification
 
 - `pytest -q` — 9 passed locally.
 - CI run (PR #16): green — https://github.com/severinlindenmann/orch-demo/pull/16/checks
 - Merged to main via squash merge.
-
-## Decisions
 
 ## Log
 
@@ -102,5 +92,7 @@ sessions:
 - 2026-10-02T07:47Z [claude-code cc8b] updated Verification
 - 2026-10-02T07:47Z [claude-code cc8b] moved in-progress → testing
 - 2026-10-02T07:47Z [you] verdict done: Merged PR #16 (squash). Issue #7 closed.
-
-## Findings
+- 2026-10-04T14:21Z [you] adopted the unsigned gate requirements into the ledger
+- 2026-10-04T14:21Z [you] adopted the unsigned gate plan into the ledger
+- 2026-10-04T14:21Z [you] adopted the unsigned verdict into the ledger
+- 2026-10-02T07:48Z [you] edited the ticket file

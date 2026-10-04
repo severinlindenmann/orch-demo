@@ -6,9 +6,9 @@ priority: high
 size: s
 status: done
 created: 2026-10-02T07:43Z
-updated: 2026-10-02T07:47Z
+updated: 2026-10-02T07:48Z
 external:
-- key: '13'
+- key: GH-13
   url: https://github.com/severinlindenmann/orch-demo/issues/13
 repos:
 - acme-energy-data
@@ -50,10 +50,6 @@ sessions:
 
 # DEMO-0007 — Accept DD/MM/YYYY gateway timestamps
 
-## Ask
-
-## Context
-
 ## Requirements
 
 - Gateway exports in DD/MM/YYYY HH:MM must be accepted alongside ISO 8601.
@@ -69,23 +65,17 @@ sessions:
 
 - Auto-detecting and supporting further timestamp formats beyond these two.
 
-## Proposal
-
 ## Plan
 
 1. Add _parse_timestamp() that tries ISO 8601 first, then the DD/MM/YYYY HH:MM format.
 2. Use it for read_at before constructing RawMeterRead.
 3. Regression test for a file using the alternate format.
 
-## Current state
-
 ## Verification
 
 - `pytest -q` — 10 passed locally.
 - CI run (PR #17): green — https://github.com/severinlindenmann/orch-demo/pull/17/checks
 - Merged to main via squash merge.
-
-## Decisions
 
 ## Log
 
@@ -102,5 +92,7 @@ sessions:
 - 2026-10-02T07:47Z [claude-code cc8b] updated Verification
 - 2026-10-02T07:47Z [copilot cc8b] moved in-progress → testing
 - 2026-10-02T07:47Z [you] verdict done: Merged PR #17 (squash). Issue #13 closed.
-
-## Findings
+- 2026-10-04T14:21Z [you] adopted the unsigned gate requirements into the ledger
+- 2026-10-04T14:21Z [you] adopted the unsigned gate plan into the ledger
+- 2026-10-04T14:21Z [you] adopted the unsigned verdict into the ledger
+- 2026-10-02T07:48Z [you] edited the ticket file

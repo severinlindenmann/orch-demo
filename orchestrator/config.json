@@ -86,5 +86,19 @@
     "github-issues",
     "databricks",
     "wiki"
+  ],
+  "sprints": [
+    {
+      "id": "S1",
+      "name": "Sprint 1 · gateway hardening",
+      "start": "2026-09-28",
+      "end": "2026-10-11"
+    },
+    {
+      "id": "S2",
+      "name": "Sprint 2",
+      "start": "2026-10-12",
+      "end": "2026-10-25"
+    }
   ]
 }

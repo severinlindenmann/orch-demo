@@ -6,9 +6,9 @@ priority: normal
 size: s
 status: backlog
 created: 2026-10-02T07:43Z
-updated: 2026-10-02T07:47Z
+updated: 2026-10-02T07:48Z
 external:
-- key: '10'
+- key: GH-10
   url: https://github.com/severinlindenmann/orch-demo/issues/10
 repos: []
 branches: {}
@@ -41,29 +41,8 @@ sessions: []
 
 # DEMO-0013 — Spike: evaluate Parquet for gateway exports
 
-## Ask
-
-## Context
-
-## Requirements
-
-## Acceptance criteria
-
-## Out of scope
-
-## Proposal
-
-## Plan
-
-## Current state
-
-## Verification
-
-## Decisions
-
 ## Log
 
 - 2026-10-02T07:43Z [claude-code cc8b] created
 - 2026-10-02T07:47Z [claude-code cc8b] Backlog; will scope the benchmark (CSV vs Parquet, size + parse time) before asking for requirements approval.
-
-## Findings
+- 2026-10-02T07:48Z [you] edited the ticket file

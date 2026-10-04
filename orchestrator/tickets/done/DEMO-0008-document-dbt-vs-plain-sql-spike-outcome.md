@@ -6,9 +6,9 @@ priority: normal
 size: xs
 status: done
 created: 2026-10-02T07:43Z
-updated: 2026-10-02T07:47Z
+updated: 2026-10-02T07:48Z
 external:
-- key: '2'
+- key: GH-2
   url: https://github.com/severinlindenmann/orch-demo/issues/2
 repos: []
 branches: {}
@@ -45,10 +45,6 @@ sessions:
 
 # DEMO-0008 — Document dbt-vs-plain-SQL spike outcome
 
-## Ask
-
-## Context
-
 ## Requirements
 
 - Decide whether to adopt dbt-core for sql/staging and sql/marts, or keep the current hand-rolled SQL + thin runner.
@@ -63,18 +59,10 @@ sessions:
 
 - Actually implementing a dbt migration (would be its own ticket if we decide to go ahead).
 
-## Proposal
-
-## Plan
-
-## Current state
-
 ## Verification
 
 - Comparison posted: https://github.com/severinlindenmann/orch-demo/issues/2
 - Decision: not now; revisit once we have more than ~10 SQL models.
-
-## Decisions
 
 ## Log
 
@@ -88,5 +76,6 @@ sessions:
 - 2026-10-02T07:47Z [claude-code cc8b] updated Verification
 - 2026-10-02T07:47Z [claude-code cc8b] moved in-progress → testing
 - 2026-10-02T07:47Z [you] verdict done: Decision recorded on issue #2; no further action needed now.
-
-## Findings
+- 2026-10-04T14:21Z [you] adopted the unsigned gate requirements into the ledger
+- 2026-10-04T14:21Z [you] adopted the unsigned verdict into the ledger
+- 2026-10-02T07:48Z [you] edited the ticket file

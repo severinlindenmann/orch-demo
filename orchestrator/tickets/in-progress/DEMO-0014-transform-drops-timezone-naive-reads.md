@@ -6,9 +6,9 @@ priority: high
 size: s
 status: in-progress
 created: 2026-10-02T07:43Z
-updated: 2026-10-02T07:47Z
+updated: 2026-10-02T07:48Z
 external:
-- key: '11'
+- key: GH-11
   url: https://github.com/severinlindenmann/orch-demo/issues/11
 repos: []
 branches: {}
@@ -45,10 +45,6 @@ sessions:
 
 # DEMO-0014 — Transform drops timezone-naive reads instead of assuming UTC
 
-## Ask
-
-## Context
-
 ## Requirements
 
 - A timezone-naive read_at must be treated as UTC instead of raising a validation error.
@@ -64,19 +60,11 @@ sessions:
 
 - Fixing the GW-09 firmware itself (tracked separately with the vendor).
 
-## Proposal
-
 ## Plan
 
 1. In _parse_timestamp / RawMeterRead construction, detect a naive datetime.
 2. Attach UTC and log a warning with the gateway id.
 3. Regression test for a naive-timestamp row.
-
-## Current state
-
-## Verification
-
-## Decisions
 
 ## Log
 
@@ -89,5 +77,6 @@ sessions:
 - 2026-10-02T07:47Z [claude-code cc8b] claimed (open → in-progress)
 - 2026-10-02T07:47Z [you] approved plan
 - 2026-10-02T07:47Z [claude-code cc8b] Implementing the UTC coercion now; no branch pushed yet.
-
-## Findings
+- 2026-10-04T14:21Z [you] adopted the unsigned gate requirements into the ledger
+- 2026-10-04T14:21Z [you] adopted the unsigned gate plan into the ledger
+- 2026-10-02T07:48Z [you] edited the ticket file

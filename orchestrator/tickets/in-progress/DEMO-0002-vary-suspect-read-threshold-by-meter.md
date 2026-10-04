@@ -6,9 +6,9 @@ priority: high
 size: m
 status: in-progress
 created: 2026-10-02T07:43Z
-updated: 2026-10-02T07:47Z
+updated: 2026-10-04T14:21Z
 external:
-- key: '3'
+- key: GH-3
   url: https://github.com/severinlindenmann/orch-demo/issues/3
 repos:
 - acme-energy-data
@@ -40,7 +40,7 @@ questions: []
 claim:
   session: cc8be880-3610-520a-8cce-3b15f6753080
   harness: claude-code
-  at: 2026-10-02T07:47Z
+  at: 2026-10-04T14:21Z
 sessions:
 - id: cc8be880-3610-520a-8cce-3b15f6753080
   harness: claude-code
@@ -49,10 +49,6 @@ sessions:
 ---
 
 # DEMO-0002 — Vary suspect-read threshold by meter type
-
-## Ask
-
-## Context
 
 ## Requirements
 
@@ -69,20 +65,12 @@ sessions:
 
 - Backfilling meter_type for historical reads that don't have it (separate ticket).
 
-## Proposal
-
 ## Plan
 
 1. Add DEFAULT_SUSPECT_THRESHOLDS dict and PipelineConfig.threshold_for().
 2. Add meter_type to RawMeterRead.
 3. Use threshold_for() in normalize_reads instead of max_interval_kwh directly.
 4. Tests for residential/industrial/unknown meter types.
-
-## Current state
-
-## Verification
-
-## Decisions
 
 ## Log
 
@@ -98,5 +86,7 @@ sessions:
 - 2026-10-02T07:47Z [claude-code cc8b] linked pr https://github.com/severinlindenmann/orch-demo/pull/20
 - 2026-10-02T07:47Z [claude-code cc8b] PR #20 open, CI green
 - 2026-10-02T07:47Z [claude-code cc8b] Review on PR #20 requested changes: document thresholds in sql/marts, and add a test for an explicit unknown meter_type string. Picking this back up.
-
-## Findings
+- 2026-10-04T14:20Z [you] adopted the unsigned gate requirements into the ledger
+- 2026-10-04T14:20Z [you] adopted the unsigned gate plan into the ledger
+- 2026-10-02T07:48Z [you] edited the ticket file
+- 2026-10-04T14:21Z [claude-code cc8b] claimed

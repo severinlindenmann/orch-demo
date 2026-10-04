@@ -6,9 +6,9 @@ priority: normal
 size: s
 status: in-progress
 created: 2026-10-02T07:43Z
-updated: 2026-10-02T07:47Z
+updated: 2026-10-04T14:21Z
 external:
-- key: '4'
+- key: GH-4
   url: https://github.com/severinlindenmann/orch-demo/issues/4
 repos:
 - acme-energy-data
@@ -40,7 +40,7 @@ questions: []
 claim:
   session: cc8be880-3610-520a-8cce-3b15f6753080
   harness: claude-code
-  at: 2026-10-02T07:47Z
+  at: 2026-10-04T14:21Z
 sessions:
 - id: cc8be880-3610-520a-8cce-3b15f6753080
   harness: claude-code
@@ -49,10 +49,6 @@ sessions:
 ---
 
 # DEMO-0004 — Add coverage reporting to CI
-
-## Ask
-
-## Context
 
 ## Requirements
 
@@ -69,19 +65,11 @@ sessions:
 
 - Deciding on and enforcing a minimum coverage percentage (needs a follow-up decision).
 
-## Proposal
-
 ## Plan
 
 1. Add pytest-cov to the dev extras.
 2. Update ci.yml to run pytest with --cov=acme --cov-report=term-missing.
 3. Open question for the human: do we want a hard coverage gate now, and at what percentage? Holding this PR as draft until that's decided.
-
-## Current state
-
-## Verification
-
-## Decisions
 
 ## Log
 
@@ -95,5 +83,6 @@ sessions:
 - 2026-10-02T07:47Z [claude-code cc8b] linked branch feature/DEMO-0004-coverage-reporting
 - 2026-10-02T07:47Z [claude-code cc8b] linked pr https://github.com/severinlindenmann/orch-demo/pull/22
 - 2026-10-02T07:47Z [claude-code cc8b] Plan drafted and PR #22 opened as draft. Holding here for the human to approve the Plan gate and decide whether to add a hard coverage threshold before marking ready.
-
-## Findings
+- 2026-10-04T14:20Z [you] adopted the unsigned gate requirements into the ledger
+- 2026-10-02T07:48Z [you] edited the ticket file
+- 2026-10-04T14:21Z [claude-code cc8b] claimed

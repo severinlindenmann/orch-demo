@@ -1,0 +1,3 @@
+compute,runs,avg_minutes,avg_cost_chf,cold_start_s
+classic,10,11.8,4.62,0
+serverless,10,12.4,3.79,40

@@ -6,9 +6,9 @@ priority: normal
 size: m
 status: in-progress
 created: 2026-10-02T07:43Z
-updated: 2026-10-02T07:47Z
+updated: 2026-10-04T14:21Z
 external:
-- key: '9'
+- key: GH-9
   url: https://github.com/severinlindenmann/orch-demo/issues/9
 repos:
 - acme-energy-data
@@ -40,7 +40,7 @@ questions: []
 claim:
   session: cc8be880-3610-520a-8cce-3b15f6753080
   harness: claude-code
-  at: 2026-10-02T07:47Z
+  at: 2026-10-04T14:21Z
 sessions:
 - id: cc8be880-3610-520a-8cce-3b15f6753080
   harness: claude-code
@@ -49,10 +49,6 @@ sessions:
 ---
 
 # DEMO-0009 — Reject gateway exports past the allowed late window
-
-## Ask
-
-## Context
 
 ## Requirements
 
@@ -69,19 +65,11 @@ sessions:
 
 - Wiring the check into the nightly runner's main loop (follow-up ticket).
 
-## Proposal
-
 ## Plan
 
 1. Add ExportTooLateError and check_export_age(export_date, run_date, config).
 2. age_days <= 0 -> on time; 0 < age_days <= allowed_late_days -> late but accepted (logged); beyond that -> raise.
 3. Tests for all three cases.
-
-## Current state
-
-## Verification
-
-## Decisions
 
 ## Log
 
@@ -96,5 +84,7 @@ sessions:
 - 2026-10-02T07:47Z [claude-code cc8b] linked branch feature/DEMO-0009-late-arriving-exports
 - 2026-10-02T07:47Z [claude-code cc8b] linked pr https://github.com/severinlindenmann/orch-demo/pull/23
 - 2026-10-02T07:47Z [claude-code cc8b] PR #23 open, CI green. Reviewer asked whether age_days should account for weekends/holidays rather than calendar days -- following up on that before this is ready to merge.
-
-## Findings
+- 2026-10-04T14:21Z [you] adopted the unsigned gate requirements into the ledger
+- 2026-10-04T14:21Z [you] adopted the unsigned gate plan into the ledger
+- 2026-10-02T07:48Z [you] edited the ticket file
+- 2026-10-04T14:21Z [claude-code cc8b] claimed

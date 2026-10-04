@@ -6,9 +6,9 @@ priority: normal
 size: s
 status: testing
 created: 2026-10-02T07:43Z
-updated: 2026-10-02T07:47Z
+updated: 2026-10-04T11:16Z
 external:
-- key: '1'
+- key: GH-1
   url: https://github.com/severinlindenmann/orch-demo/issues/1
 repos:
 - acme-energy-data
@@ -46,13 +46,14 @@ sessions:
   harness: claude-code
   model: null
   started: 2026-10-02T07:47Z
+artifacts:
+- url: https://github.com/severinlindenmann/orch-demo/pull/19/checks
+  kind: build
+  added: 2026-10-04T11:16Z
+  label: 'CI run on PR #19: green'
 ---
 
 # DEMO-0001 — Add retry with backoff for gateway downloads
-
-## Ask
-
-## Context
 
 ## Requirements
 
@@ -71,8 +72,6 @@ sessions:
 
 - Wiring fetch_with_retry into the nightly job runner itself (follow-up ticket).
 
-## Proposal
-
 ## Plan
 
 1. Add fetch_with_retry(download_fn, gateway_id, max_attempts) to acme.ingest.
@@ -80,15 +79,11 @@ sessions:
 3. Re-raise the last exception once attempts are exhausted.
 4. Unit tests with a fake flaky callable (fails N times then succeeds; always fails).
 
-## Current state
-
 ## Verification
 
 - `pytest -q` — 12 passed locally on the feature branch.
 - CI run (GitHub Actions, PR #19): green — https://github.com/severinlindenmann/orch-demo/pull/19/checks
 - Manually exercised fetch_with_retry with a callable that fails twice then succeeds, and one that always fails — behaves as specified.
-
-## Decisions
 
 ## Log
 
@@ -106,5 +101,7 @@ sessions:
 - 2026-10-02T07:47Z [claude-code cc8b] updated Verification
 - 2026-10-02T07:47Z [claude-code cc8b] moved in-progress → testing
 - 2026-10-02T07:47Z [claude-code cc8b] PR #19 open, CI green, awaiting human review
-
-## Findings
+- 2026-10-04T14:21Z [you] adopted the unsigned gate requirements into the ledger
+- 2026-10-04T14:21Z [you] adopted the unsigned gate plan into the ledger
+- 2026-10-02T07:48Z [you] edited the ticket file
+- 2026-10-04T11:16Z [claude-code 0a42] linked build https://github.com/severinlindenmann/orch-demo/pull/19/checks

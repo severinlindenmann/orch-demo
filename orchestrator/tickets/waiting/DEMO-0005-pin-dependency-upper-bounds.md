@@ -6,9 +6,9 @@ priority: normal
 size: xs
 status: waiting
 created: 2026-10-02T07:43Z
-updated: 2026-10-02T07:47Z
+updated: 2026-10-02T07:48Z
 external:
-- key: '15'
+- key: GH-15
   url: https://github.com/severinlindenmann/orch-demo/issues/15
 repos:
 - acme-energy-data
@@ -38,7 +38,7 @@ gates:
     via: null
 questions:
 - id: Q1
-  text: "main already pins these dependencies — how should PR #18 be reconciled?"
+  text: 'main already pins these dependencies — how should PR #18 be reconciled?'
   why: main and this branch both touched the same two dependency lines.
   type: single
   options:
@@ -71,10 +71,6 @@ sessions:
 
 # DEMO-0005 — Pin dependency upper bounds
 
-## Ask
-
-## Context
-
 ## Requirements
 
 - Direct dependencies (pandas, pydantic) need explicit upper bounds.
@@ -90,16 +86,6 @@ sessions:
 
 - Introducing a full lockfile (uv.lock / poetry.lock) — separate decision.
 
-## Proposal
-
-## Plan
-
-## Current state
-
-## Verification
-
-## Decisions
-
 ## Log
 
 - 2026-10-02T07:43Z [claude-code cc8b] created
@@ -112,5 +98,5 @@ sessions:
 - 2026-10-02T07:47Z [claude-code cc8b] linked pr https://github.com/severinlindenmann/orch-demo/pull/18
 - 2026-10-02T07:47Z [copilot cc8b] PR #18 opened. main has since picked a different, incompatible pin (DEMO-0005 commit landed directly on main instead of through this PR), so #18 now shows a merge conflict on pyproject.toml.
 - 2026-10-02T07:47Z [claude-code cc8b] asked Q1 → waiting
-
-## Findings
+- 2026-10-04T14:21Z [you] adopted the unsigned gate requirements into the ledger
+- 2026-10-02T07:48Z [you] edited the ticket file

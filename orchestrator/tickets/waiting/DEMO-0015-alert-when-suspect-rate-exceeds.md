@@ -6,9 +6,9 @@ priority: normal
 size: m
 status: waiting
 created: 2026-10-02T07:43Z
-updated: 2026-10-02T07:47Z
+updated: 2026-10-02T07:48Z
 external:
-- key: '12'
+- key: GH-12
   url: https://github.com/severinlindenmann/orch-demo/issues/12
 repos: []
 branches: {}
@@ -66,10 +66,6 @@ sessions:
 
 # DEMO-0015 — Alert when suspect rate exceeds threshold for 3 consecutive runs
 
-## Ask
-
-## Context
-
 ## Requirements
 
 - Track suspect rate history per gateway across runs.
@@ -85,20 +81,12 @@ sessions:
 
 - Routing the alert anywhere beyond a log line (paging, Slack, etc.) — follow-up ticket.
 
-## Proposal
-
 ## Plan
 
 1. Decide where the per-gateway streak state lives (see open question).
 2. Add a streak counter keyed by gateway_id, reset on a non-breaching run.
 3. Emit a log-level alert when the streak reaches 3.
 4. Unit test for the 3-strikes logic.
-
-## Current state
-
-## Verification
-
-## Decisions
 
 ## Log
 
@@ -111,5 +99,6 @@ sessions:
 - 2026-10-02T07:47Z [claude-code cc8b] claimed (open → in-progress)
 - 2026-10-02T07:47Z [you] approved plan
 - 2026-10-02T07:47Z [claude-code cc8b] asked Q1 → waiting
-
-## Findings
+- 2026-10-04T14:21Z [you] adopted the unsigned gate requirements into the ledger
+- 2026-10-04T14:21Z [you] adopted the unsigned gate plan into the ledger
+- 2026-10-02T07:48Z [you] edited the ticket file

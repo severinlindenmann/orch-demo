@@ -1,0 +1,7 @@
+$ python -m unittest discover -s tests -t .
+test_empty_export_returns_no_rows ... ok
+test_empty_export_logs_a_warning ... ok
+
+Ran 14 tests in 0.388s
+
+OK

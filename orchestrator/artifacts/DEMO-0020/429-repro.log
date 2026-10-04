@@ -1,0 +1,9 @@
+$ python -m unittest discover -s tests -t .
+test_429_without_retry_after_waits_30s ... ok
+test_429_with_retry_after_uses_header ... ok
+test_503_then_200_loads_the_file ... ok
+test_empty_export_returns_no_rows ... ok
+
+Ran 14 tests in 0.412s
+
+OK

@@ -6,9 +6,9 @@ priority: normal
 size: s
 status: open
 created: 2026-10-02T07:43Z
-updated: 2026-10-02T07:47Z
+updated: 2026-10-02T07:48Z
 external:
-- key: '14'
+- key: GH-14
   url: https://github.com/severinlindenmann/orch-demo/issues/14
 repos: []
 branches: {}
@@ -41,10 +41,6 @@ sessions: []
 
 # DEMO-0010 — Flag duplicate interval reads in the quality gate
 
-## Ask
-
-## Context
-
 ## Requirements
 
 - Duplicate (meter_id, read_at) rows above zero must fail the quality gate by default.
@@ -60,16 +56,6 @@ sessions: []
 
 - Automatic de-duplication at ingest time (handled separately by dedupe_reads).
 
-## Proposal
-
-## Plan
-
-## Current state
-
-## Verification
-
-## Decisions
-
 ## Log
 
 - 2026-10-02T07:43Z [claude-code cc8b] created
@@ -77,5 +63,5 @@ sessions: []
 - 2026-10-02T07:47Z [claude-code cc8b] updated Acceptance criteria
 - 2026-10-02T07:47Z [claude-code cc8b] updated Out of scope
 - 2026-10-02T07:47Z [you] approved requirements → open
-
-## Findings
+- 2026-10-04T14:20Z [you] adopted the unsigned gate requirements into the ledger
+- 2026-10-02T07:48Z [you] edited the ticket file

@@ -6,9 +6,9 @@ priority: urgent
 size: s
 status: in-progress
 created: 2026-10-02T07:43Z
-updated: 2026-10-02T07:47Z
+updated: 2026-10-02T07:48Z
 external:
-- key: '5'
+- key: GH-5
   url: https://github.com/severinlindenmann/orch-demo/issues/5
 repos:
 - acme-energy-data
@@ -50,10 +50,6 @@ sessions:
 
 # DEMO-0003 — Guard suspect-rate summary against zero rows
 
-## Ask
-
-## Context
-
 ## Requirements
 
 - The on-call summary line must never raise ZeroDivisionError on an empty run.
@@ -69,19 +65,11 @@ sessions:
 
 - Reworking QualityReport's public API beyond this one summary helper.
 
-## Proposal
-
 ## Plan
 
 1. Add suspect_rate_percent(report) with an explicit zero-rows guard.
 2. Regression test for total_rows == 0.
 3. Regression test for the normal case to lock in the percentage math.
-
-## Current state
-
-## Verification
-
-## Decisions
 
 ## Log
 
@@ -96,5 +84,6 @@ sessions:
 - 2026-10-02T07:47Z [claude-code cc8b] linked branch fix/DEMO-0003-quality-divide-by-zero
 - 2026-10-02T07:47Z [claude-code cc8b] linked pr https://github.com/severinlindenmann/orch-demo/pull/21
 - 2026-10-02T07:47Z [copilot cc8b] PR #21 open. CI is red: tests/test_quality_zero_rows.py has one test with a wrong expected value, left in on purpose for this demo (see PR body). Fixing is a one-line change but leaving it red to show the failing-CI case.
-
-## Findings
+- 2026-10-04T14:20Z [you] adopted the unsigned gate requirements into the ledger
+- 2026-10-04T14:20Z [you] adopted the unsigned gate plan into the ledger
+- 2026-10-02T07:48Z [you] edited the ticket file
