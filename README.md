@@ -47,6 +47,12 @@ pip install -e .[dev]
 pytest -q
 ```
 
+## Dependency pins
+
+Direct dependencies carry an upper bound (see `pyproject.toml`). Bump the
+upper bound deliberately in its own PR, run the full test suite, and only
+then widen it, rather than letting a transitive upgrade land unreviewed.
+
 ## CI
 
 GitHub Actions runs `pytest -q` against Python 3.11 on every push and pull request (see
