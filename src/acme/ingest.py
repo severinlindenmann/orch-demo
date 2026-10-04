@@ -6,6 +6,7 @@ import logging
 from datetime import datetime
 from pathlib import Path
 
+from acme.config import PipelineConfig
 from acme.models import RawMeterRead
 
 logger = logging.getLogger(__name__)
@@ -57,6 +58,31 @@ def parse_gateway_export(path: Path) -> list[RawMeterRead]:
                     "skipping malformed row %s:%d (%s): %s", path.name, line_no, row, exc
                 )
     return reads
+
+
+class ExportTooLateError(Exception):
+    """Raised when a gateway export arrives past the allowed late window."""
+
+
+def check_export_age(
+    export_date: datetime, run_date: datetime, config: PipelineConfig
+) -> bool:
+    """Check how late `export_date` is relative to `run_date`.
+
+    Returns True if the export is late but still within
+    `config.allowed_late_days`. Raises `ExportTooLateError` if it is
+    older than that window. Returns False for an on-time export.
+    """
+    age_days = (run_date.date() - export_date.date()).days
+    if age_days <= 0:
+        return False
+    if age_days > config.allowed_late_days:
+        raise ExportTooLateError(
+            f"export for {export_date.date()} is {age_days} days late "
+            f"(allowed: {config.allowed_late_days})"
+        )
+    logger.warning("accepting late export for %s (%d days late)", export_date.date(), age_days)
+    return True
 
 
 def load_gateway_exports(export_dir: Path) -> list[RawMeterRead]:
