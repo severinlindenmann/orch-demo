@@ -65,3 +65,32 @@ def load_gateway_exports(export_dir: Path) -> list[RawMeterRead]:
     for csv_path in sorted(export_dir.glob("*.csv")):
         reads.extend(parse_gateway_export(csv_path))
     return reads
+
+
+def fetch_with_retry(download_fn, gateway_id: str, max_attempts: int = 3):
+    """Call `download_fn()` with retries, for flaky gateway connections.
+
+    `download_fn` takes no arguments and either returns the downloaded
+    payload or raises. Retries up to `max_attempts` times with a short
+    linear backoff between attempts, then re-raises the last error.
+    """
+    import time
+
+    last_exc: Exception | None = None
+    for attempt in range(1, max_attempts + 1):
+        try:
+            return download_fn()
+        except Exception as exc:  # noqa: BLE001 - deliberately broad, network layer varies
+            last_exc = exc
+            logger.warning(
+                "download from %s failed (attempt %d/%d): %s",
+                gateway_id,
+                attempt,
+                max_attempts,
+                exc,
+            )
+            if attempt < max_attempts:
+                time.sleep(0.5 * attempt)
+    logger.error("giving up on %s after %d attempts", gateway_id, max_attempts)
+    assert last_exc is not None
+    raise last_exc
