@@ -26,3 +26,16 @@ def test_load_gateway_exports_reads_all_csvs(tmp_path: Path):
     )
     reads = load_gateway_exports(tmp_path)
     assert len(reads) == 2
+
+
+def test_parse_gateway_export_accepts_alt_timestamp_format(tmp_path: Path):
+    export = tmp_path / "gw04.csv"
+    export.write_text(
+        "meter_id,gateway_id,read_at,kwh\n"
+        "MTR-010,GW-04,01/09/2026 00:00,1.1\n"
+    )
+    reads = parse_gateway_export(export)
+    assert len(reads) == 1
+    assert reads[0].read_at.year == 2026
+    assert reads[0].read_at.month == 9
+    assert reads[0].read_at.day == 1

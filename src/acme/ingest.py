@@ -3,11 +3,30 @@ from __future__ import annotations
 
 import csv
 import logging
+from datetime import datetime
 from pathlib import Path
 
 from acme.models import RawMeterRead
 
 logger = logging.getLogger(__name__)
+
+_ALT_TIMESTAMP_FORMAT = "%d/%m/%Y %H:%M"
+
+
+def _parse_timestamp(value: str) -> str:
+    """Normalize a gateway timestamp to ISO 8601.
+
+    Most gateways emit ISO 8601 already, which pydantic parses directly.
+    A couple of substations (GW-04, GW-11) emit `DD/MM/YYYY HH:MM`
+    instead; this coerces that alternate format to ISO 8601 so it
+    validates the same way.
+    """
+    try:
+        datetime.fromisoformat(value.replace("Z", "+00:00"))
+        return value
+    except ValueError:
+        parsed = datetime.strptime(value, _ALT_TIMESTAMP_FORMAT)
+        return parsed.isoformat()
 
 
 def parse_gateway_export(path: Path) -> list[RawMeterRead]:
@@ -29,7 +48,7 @@ def parse_gateway_export(path: Path) -> list[RawMeterRead]:
                     RawMeterRead(
                         meter_id=row["meter_id"],
                         gateway_id=row["gateway_id"],
-                        read_at=row["read_at"],
+                        read_at=_parse_timestamp(row["read_at"]),
                         kwh=float(row["kwh"]),
                     )
                 )
