@@ -296,3 +296,32 @@ def test_run_works_right_after_ledger_adopt(demo_ws):
     assert not scan.tampered and not scan.gaps  # orch accepts the log: seq is contiguous
     for key in ss.STALE:
         assert claim_expired(store.load(demo_ws, key)[1].meta["claim"], 4), key
+
+
+def _second_copy(ws, dst):
+    """A fresh baseline copy of `ws` (before any build), opened as its own workspace."""
+    from orch.core.workspace import Workspace
+    shutil.copytree(ws.root / "orchestrator", dst / "orchestrator")
+    return Workspace.open(dst)
+
+
+def test_a_ledger_from_an_earlier_seed_with_the_same_identity_is_refused_up_front(demo_ws, tmp_path):
+    # Root cause of "the delegation on DEMO-0034 is paused already": orch keys ledger entries by workspace_id
+    # (customer|prefix) and the delegation id is the charter's content hash, so an earlier seed of a demo with the
+    # same identity (same ledger) makes its signed decisions count for this run.
+    again = _second_copy(demo_ws, tmp_path / "again")
+    _build(demo_ws)
+    assert st.ledger_collisions(again)  # the first seed's decisions on DEMO-0016.. now read as this workspace's
+    with pytest.raises(sp.SeedError, match="already holds"):
+        _build(again)
+
+
+def test_the_demo_has_its_own_ledger_identity():
+    from orch.core import ledger
+    cfg = json.loads((sp.HARNESS / "orchestrator" / "config.json").read_text())
+
+    class WS:
+        config = cfg
+    old = type("Old", (), {"config": {"customer": "Acme Energy", "id": {"prefix": "DEMO"}}})
+    assert ledger.workspace_id(WS) != ledger.workspace_id(old)  # the private demo seeded before used this one
+    assert cfg["id"]["prefix"] == "DEMO"

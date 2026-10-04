@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "customer": "Acme Energy",
+  "customer": "Acme Energy (orch demo)",
   "harnesses": [
     "claude-plugin"
   ],

@@ -324,6 +324,39 @@ def refresh_claims(ws, keys=REFRESH) -> list[str]:
     return done
 
 
+def ledger_collisions(ws, specs=TICKETS) -> dict[str, list[str]]:
+    """Signed decisions this machine's ledger already holds, under this workspace's identity, on the tickets the seed
+    is about to create. orch keys ledger entries by workspace_id (sha256 of config `customer` + id prefix) and ticket,
+    and an epic's delegation id is its charter's content hash: an earlier seed of a demo with the same identity (an
+    older copy, a reset after a partial run) therefore makes its approvals, charters and pauses count for this run,
+    which fails halfway (e.g. "the delegation on DEMO-0034 is paused already"). Empty once the tickets exist."""
+    from orch.core import ledger, store
+    keys = {s.key for s in specs}
+    if keys & {e.id for e in store.scan(ws) if e.meta is not None}:
+        return {}  # already built (or partly built): build() reports that itself
+    out: dict[str, list[str]] = {}
+    for e in ledger.entries(ws):
+        if e.get("ticket") in keys:
+            out.setdefault(e["ticket"], []).append(str(e.get("kind")))
+    return out
+
+
+def collision_hint(ws, found: dict[str, list[str]]) -> str:
+    cfg = ws.config
+    listed = "; ".join(f"{k}: {', '.join(sorted(set(v)))}" for k, v in sorted(found.items()))
+    return (f"your orch ledger already holds decisions for this workspace's identity "
+            f"(customer {cfg.get('customer')!r}, prefix {(cfg.get('id') or {}).get('prefix')!r}) on tickets the seed "
+            f"is about to create ({listed}). They come from an earlier seed of a demo with the same identity, and orch "
+            "would read them as this run's. Give orchestrator/config.json a `customer` no earlier seed used, run "
+            "`orch ledger adopt --workspace` for the baseline under the new identity, then run again; nothing was changed")
+
+
+def check_ledger(ws) -> None:
+    found = ledger_collisions(ws)
+    if found:
+        raise sp.SeedError(collision_hint(ws, found))
+
+
 def unsigned_on(ws, keys=REFRESH) -> dict[str, list[str]]:
     """Decisions on the existing tickets among `keys` that the ledger on this machine does not hold. orch lets an
     agent (re)claim only on signed decisions, so these need `orch ledger adopt` by the human first."""
@@ -371,6 +404,7 @@ def run_all(ws, refs: Refs, *, sign_earlier: bool = False) -> dict[str, str]:
     `sign_earlier` (scratch copies and tests only, see seed_scratch) also adopts the decisions made before the
     ledger existed into the throwaway scratch ledger; on the real demo the human adopts them with `orch ledger adopt`."""
     from orch.core.maintenance import build_index
+    check_ledger(ws)  # before any write: an earlier seed's signed decisions would be read as this run's
     start, end = timeline_window(ws, datetime.now(timezone.utc))  # before any write
     ws = ensure_sprints(ws, end.date())
     with virtual_clock(start):
@@ -414,7 +448,9 @@ def cmd_tickets(args) -> int:
             require_human_terminal("seeding the demo tickets", hint="run `seed.py tickets --apply` in your own terminal")
         except OrchError as e:
             raise sp.SeedError(f"{e.message}; {e.hint}") from e
-        missing = unsigned_on(Workspace.open(sp.HARNESS))
+        ws = Workspace.open(sp.HARNESS)
+        check_ledger(ws)  # the rehearsal's scratch ledger cannot see your real one: check it here, read-only
+        missing = unsigned_on(ws)
         if missing:  # the fresh claims at the end would be refused: stop before anything is written
             raise sp.SeedError(adopt_hint(missing))
     refs = Refs(sp.load_out())

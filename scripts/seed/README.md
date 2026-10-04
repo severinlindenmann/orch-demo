@@ -28,6 +28,15 @@ the tests read it from the repository's initial commit. Those tickets cite the h
 
 ## Human decisions and the approval ledger
 
+**Workspace identity.** orch keys every ledger entry by `workspace_id` (sha256 of the config's `customer` and id
+prefix) and ticket, and an epic's delegation id is its charter's content hash. Two demos with the same identity
+therefore share decisions in one user's ledger: seeding again after an earlier seed of the same identity would read the
+old approvals, charters and pauses as this run's (it failed with "the delegation on DEMO-0034 is paused already").
+This demo's customer is `Acme Energy (orch demo)`, distinct from the earlier private demo's `Acme Energy`.
+`tickets --apply` checks your ledger read-only before the rehearsal (`seed_tickets.ledger_collisions`) and stops with
+the colliding tickets; if it does, give `orchestrator/config.json` a `customer` no earlier seed used, adopt the
+baseline again and rerun.
+
 orch-core signs every human decision (requirements/plan approvals, answers, verdicts, closes) into a per-user
 ledger (`ledger.jsonl` plus the HMAC key `ledger.key` in the orch config dir: `$ORCH_STATE_DIR`, else
 `$XDG_CONFIG_HOME/orch`, else `~/.config/orch`). Agents can only claim, start or finish tasks and move to testing
