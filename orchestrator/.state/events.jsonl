@@ -383,3 +383,6 @@
 {"seq": 383, "at": "2026-10-04T14:21:45Z", "ticket": "DEMO-0024", "kind": "claim.taken", "actor": "agent:claude-code:2d87c094", "via": "cli", "data": {"session": "2d87c094-d3c9-5c1f-916e-5e04b5b60141"}}
 {"seq": 384, "at": "2026-10-04T14:21:46Z", "ticket": "DEMO-0028", "kind": "claim.taken", "actor": "agent:copilot:26139d76", "via": "cli", "data": {"session": "26139d76-f5e4-5a35-b259-c9f5db61621d"}}
 {"seq": 385, "at": "2026-10-04T14:21:46Z", "ticket": "DEMO-0032", "kind": "claim.taken", "actor": "agent:claude-code:2743f332", "via": "cli", "data": {"session": "2743f332-25d9-594f-b329-9e7981d9b538"}}
+{"seq": 386, "at": "2026-10-05T05:38:10Z", "ticket": "DEMO-0018", "kind": "gate.invalidated", "actor": "agent:orch-check", "via": "check", "data": {"gate": "requirements", "hash": "sha256:9a0c8602aa27ad55463fc998da22fbddd0032152b880066c2e4ab5484c77b79c"}}
+{"seq": 387, "at": "2026-10-05T05:38:10Z", "ticket": "DEMO-0033", "kind": "gate.invalidated", "actor": "agent:orch-check", "via": "check", "data": {"gate": "requirements", "hash": "sha256:d9c474b763262c6429eaeac92e3d3d6815c7a7c525c07e0e12641e9a177b4d71"}}
+{"seq": 388, "at": "2026-10-05T05:38:10Z", "ticket": "DEMO-0025", "kind": "gate.invalidated", "actor": "agent:orch-check", "via": "check", "data": {"gate": "plan", "hash": "sha256:d8e23d6eb73942bec11bb8b89bd85eaa93d1c859f2e8bb92953830d289c87409"}}
