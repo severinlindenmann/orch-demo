@@ -70,7 +70,7 @@ def ensure_clone(name: str, w: sp.Writer) -> None:
         return
     if d.exists() and any(d.iterdir()):
         raise sp.SeedError(f"{d} exists and is not a git clone; move it away first (nothing was changed)")
-    w(["git", "clone", f"git@github.com:{SUBREPOS[name]}.git", d])
+    w(["gh", "repo", "clone", SUBREPOS[name], d])  # https via gh; no SSH key needed
 
 
 def ensure_main(name: str, w: sp.Writer) -> None:

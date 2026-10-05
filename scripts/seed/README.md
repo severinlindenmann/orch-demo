@@ -8,6 +8,9 @@ commands.
 uv run --project <orch-core>/plugins/orch-core python scripts/seed/seed.py <command> [--apply]
 ```
 
+Needs `gh` logged in (`gh auth status`): the seed clones through `gh repo clone` (https), so no SSH key to GitHub is
+required.
+
 ## Repos, owner and order
 
 The GitHub account and repo names live in one place, `seed_proc.py`: `OWNER` (default `severinlindenmann`, override
@@ -24,7 +27,8 @@ the tests read it from the repository's initial commit. Those tickets cite the h
 1. `baseline --apply` (harness labels, milestones, issues #1-#15, PRs #16-#24; then `git pull --ff-only`)
 2. `repos --apply`, `prs --apply`, `issues --apply` (writes `out/github.json`), `wiki --apply` (the wiki needs one
    page created in the browser first: GitHub creates a wiki's git repo only then)
-3. `orch ledger adopt --workspace`, then `tickets --apply`, in your own terminal (see below)
+3. `orch ledger adopt --workspace --all` (one confirmation for the whole list instead of one prompt per decision,
+   55 of them on the demo), then `tickets --apply`, in your own terminal (see below)
 
 ## Human decisions and the approval ledger
 
@@ -52,7 +56,7 @@ The seed follows those rules instead of working around them:
   "running inside an agent harness"; that is intended.
 - Decisions made before the ledger existed (DEMO-0001..0015) are not in your ledger. `refresh-claims` and
   `tickets --apply` list them and stop; review and sign them yourself with
-  `uv run --project <orch-core>/plugins/orch-core orch ledger adopt --workspace` from the demo root, then run again. The seed
+  `uv run --project <orch-core>/plugins/orch-core orch ledger adopt --workspace --all` from the demo root, then run again. The seed
   never adopts on the real demo for you.
   You can run again right away: the timeline starts after the last event that is not a `ledger.adopted` line.
   `orch ledger adopt` stamps those lines with the real time of the signing, so counting them would leave no 6 h
@@ -101,8 +105,7 @@ changed and delegated, an active and a paused delegation, and tickets in the cur
 
 ## Scratch copies and the test hook
 
-The `tickets` rehearsal, `shots` and screenshot/demo servers (e.g. a `devserve.py` that builds a scratch copy and
-serves it) work on a copy of the demo with a throwaway orch user dir:
+The `tickets` rehearsal, `shots` and screenshot/demo servers (`devserve.py`, below) work on a copy of the demo with a throwaway orch user dir:
 
 - `seed_scratch.isolate_env(tmp)` points `ORCH_STATE_DIR` and `XDG_CONFIG_HOME` at `tmp`, removes the agent
   markers from the environment and sets `ORCH_DEMO_SCRATCH=tmp`. The ledger key created there is a temporary one.
@@ -123,9 +126,19 @@ serves it) work on a copy of the demo with a throwaway orch user dir:
   stub never exists in the process that applies to the real demo, and the rehearsal's decisions never reach your
   real ledger.
 
+`devserve.py` is that sequence as a script: it serves a scratch copy of the demo on a port you choose, from any
+session, without touching your real orch user dir or the demo itself:
+
+```sh
+uv run --project <orch-core>/plugins/orch-core --extra dashboard python scripts/seed/devserve.py 8901
+# prints: READY http://127.0.0.1:8901/?token=... root=<scratch copy>; Ctrl-C stops it
+```
+
+To check unmerged orch-core code, point `--project` at your clone's `plugins/orch-core`.
+
 The hook is never used on the real `--apply` paths. The seed's tests (`scripts/seed/tests`) isolate the
 environment the same way (temporary `ORCH_STATE_DIR`/`XDG_CONFIG_HOME`, `process_chain` stub):
 
 ```sh
-uv run --project <orch-core>/plugins/orch-core python -m pytest -q scripts/seed/tests
+uv run --project <orch-core>/plugins/orch-core --extra dev python -m pytest -q scripts/seed/tests
 ```

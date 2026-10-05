@@ -8,7 +8,7 @@ import seed_proc as sp
 
 PAGES_DIR = sp.HERE / "wiki_pages"
 MARKER = f"<!-- seeded by {sp.HARNESS_NAME}/scripts/seed/wiki_pages; edit the source there -->"
-WIKI_URL = f"git@github.com:{sp.HARNESS_REPO}.wiki.git"
+WIKI_REPO = f"{sp.HARNESS_REPO}.wiki"  # cloned with `gh repo clone` (https; no SSH key needed)
 
 
 def clone_dir() -> Path:
@@ -29,7 +29,7 @@ def _sync_clone() -> Path:
         sp.run(["git", "-C", d, "pull", "--ff-only"])  # local scratch clone; a read from GitHub
     else:
         d.parent.mkdir(parents=True, exist_ok=True)
-        sp.run(["git", "clone", WIKI_URL, d])
+        sp.run(["gh", "repo", "clone", WIKI_REPO, d])
     return d
 
 

@@ -1,3 +1,5 @@
+from pathlib import Path
+
 import pytest
 
 import seed_proc as sp
@@ -50,3 +52,10 @@ def test_apply_executes_and_refuses_first(fake_run):
     with pytest.raises(sp.SeedError, match="never allowed"):
         w(["git", "push", "--force", "origin", "main"])
     assert len(fake_run.calls) == 1
+
+
+def test_seed_clones_over_https_not_ssh():
+    # a fresh machine without an SSH key to GitHub must be able to seed (QA S2)
+    here = Path(__file__).resolve().parents[1]
+    for src in here.glob("seed*.py"):
+        assert "git@github.com" not in src.read_text(encoding="utf-8"), src.name

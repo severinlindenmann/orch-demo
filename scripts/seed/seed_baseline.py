@@ -37,7 +37,7 @@ def _sync_clone() -> Path:
         sp.run(["git", "-C", d, "merge", "--ff-only", "origin/main"])
     else:
         d.parent.mkdir(parents=True, exist_ok=True)
-        sp.run(["git", "clone", f"git@github.com:{R}.git", d])
+        sp.run(["gh", "repo", "clone", R, d])  # https via gh; no SSH key needed
     return d
 
 
