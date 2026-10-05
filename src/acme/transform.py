@@ -16,12 +16,13 @@ def normalize_reads(
     """
     normalized: list[MeterRead] = []
     for raw in raw_reads:
+        threshold = config.threshold_for(raw.meter_type)
         normalized.append(
             MeterRead(
                 meter_id=raw.meter_id,
                 read_at=raw.read_at,
                 kwh=raw.kwh,
-                is_suspect=raw.kwh > config.max_interval_kwh,
+                is_suspect=raw.kwh > threshold,
                 source_gateway_id=raw.gateway_id,
             )
         )
